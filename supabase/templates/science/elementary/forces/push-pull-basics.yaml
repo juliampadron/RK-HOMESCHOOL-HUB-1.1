@@ -1,0 +1,162 @@
+metadata:
+  id: push_pull_basics
+  title: "Push & Pull Detective"
+  subject: science
+  grade_range: [K, 1ST, 2ND]
+  duration_minutes: 30
+  standards:
+    - "K-PS2-1: Plan and conduct investigations"
+    - "K-PS2-2: Analyze data"
+  version: "1.0"
+  created: "2026-02-26"
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"
+    secondary: "#2B59C3"
+    accent: "#FBC440"
+
+layout:
+  template: lab-report.hbs
+  orientation: portrait
+  page_size: letter
+
+levels:
+  "[BELOW]":
+    header:
+      title: "🚀 Push & Pull Detective 🚀"
+      subtitle: "Forces are all around us! Can you find them?"
+      instructions: "Look around your home. Draw 3 things you can PUSH and 3 things you can PULL."
+    
+    sections:
+      - type: instruction_box
+        content: |
+          A **PUSH** moves something AWAY from you.
+          A **PULL** brings something CLOSER to you.
+      
+      - type: two_column_activity
+        left:
+          title: "PUSH Things"
+          icon: "👉"
+          items:
+            - "Draw or write: _____________________"
+            - "Draw or write: _____________________"
+            - "Draw or write: _____________________"
+        right:
+          title: "PULL Things"
+          icon: "👈"
+          items:
+            - "Draw or write: _____________________"
+            - "Draw or write: _____________________"
+            - "Draw or write: _____________________"
+      
+      - type: drawing_space
+        title: "My Favorite Push or Pull"
+        height: 250
+      
+      - type: parent_connection
+        content: |
+          **For Parents:** Talk about everyday forces! How many pushes and pulls can you find around your home?
+
+  "[STANDARD]":
+    header:
+      title: "🚀 Push & Pull Detective 🚀"
+      subtitle: "Explore forces in your world!"
+      instructions: "Can you find 3 things you can PUSH and 3 things you can PULL? Draw them and write a sentence about each one."
+    
+    sections:
+      - type: instruction_box
+        content: |
+          A **PUSH** moves something AWAY from you.
+          A **PULL** brings something CLOSER to you.
+          Both pushes and pulls are **forces**.
+      
+      - type: two_column_activity
+        left:
+          title: "PUSH Things"
+          icon: "👉"
+          items:
+            - "1. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_1}}"
+            - ""
+            - "2. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_2}}"
+            - ""
+            - "3. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_3}}"
+        right:
+          title: "PULL Things"
+          icon: "👈"
+          items:
+            - "1. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_4}}"
+            - ""
+            - "2. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_5}}"
+            - ""
+            - "3. _________________________ (What did you draw?)"
+            - "Sentence: {{writing_line_6}}"
+      
+      - type: experiment
+        title: "🔬 Try This At Home!"
+        steps:
+          - "Find a toy car or small object"
+          - "Push it across the floor. How far did it go?"
+          - "Now push it on carpet. What happened?"
+          - "Write or draw: Why do you think it went different distances?"
+      
+      - type: parent_connection
+        content: |
+          **For Parents:** Talk about friction! Smooth surfaces have less friction than rough surfaces. That's why the toy moved differently!
+
+  "[ADVANCED]":
+    header:
+      title: "🚀 Push & Pull Detective 🚀"
+      subtitle: "Investigate forces and their effects!"
+      instructions: "Find examples of pushes and pulls. Analyze which ones are stronger and predict what will happen."
+    
+    sections:
+      - type: instruction_box
+        content: |
+          **Forces** are pushes and pulls that make things move or change shape.
+          **Friction** is a force that slows things down or stops movement.
+          **Gravity** is a force that pulls things toward Earth.
+      
+      - type: investigation
+        title: "My Investigation: Comparing Pushes"
+        steps:
+          - "Choose an object to push (toy car, ball, etc.)"
+          - "Make a prediction: On which surface will the object slide farthest?"
+          - "Test on 3 different surfaces: carpet, hardwood, tile"
+          - "Measure the distance traveled each time"
+          - "Repeat 3 times on each surface"
+      
+      - type: data_table
+        title: "Results Table"
+        columns: ["Surface", "Trial 1 (cm)", "Trial 2 (cm)", "Trial 3 (cm)", "Average"]
+        rows: 4
+      
+      - type: analysis
+        content: |
+          **What do your results show?**
+          _______________________________________________
+          
+          **Which surface had the most friction?**
+          _______________________________________________
+          
+          **Why do you think friction works this way?**
+          _______________________________________________
+      
+      - type: writing_prompt
+        question: "Design an experiment to test if a heavier object is harder to push. What would you do?"
+        lines: 4
+      
+      - type: parent_connection
+        content: |
+          **For Parents:** Challenge your child to predict and test! "What surfaces in our home have high friction? Low friction?" This builds scientific thinking.
+
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "Science Safari Series"
+  right: "Forces & Motion"
