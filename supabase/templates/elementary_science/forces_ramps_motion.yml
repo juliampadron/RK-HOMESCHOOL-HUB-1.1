@@ -1,0 +1,23 @@
+---
+category: Elementary Science
+subject: Forces - Ramps & Motion
+levels:
+  BELOW:
+    materials: List materials needed for the worksheet.
+    procedure: Steps for experimentation.
+    data_table: Table for data collection.
+    analysis_prompt: Questions for analysis.
+    parent_connection: Tips for parents to engage with their child about the topic.
+  STANDARD:
+    materials: List materials needed for the worksheet.
+    procedure: Steps for experimentation.
+    data_table: Table for data collection.
+    analysis_prompt: Questions for analysis.
+    parent_connection: Tips for parents to engage with their child about the topic.
+  ADVANCED:
+    materials: List materials needed for the worksheet.
+    procedure: Steps for experimentation.
+    data_table: Table for data collection.
+    analysis_prompt: Questions for analysis.
+    parent_connection: Tips for parents to engage with their child about the topic.
+---
