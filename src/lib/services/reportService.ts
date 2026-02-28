@@ -108,7 +108,7 @@ function addKeyValue(
 
 export async function generateQuarterlyReportPdf(
   report: QuarterlyReport
-): Promise<Uint8Array> {
+): Promise<ArrayBuffer> {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
 
   const title = `IHIP Quarterly Report — Q${report.quarter} ${report.year}`;
@@ -257,5 +257,5 @@ export async function generateQuarterlyReportPdf(
     );
   }
 
-  return doc.output("arraybuffer") as unknown as Uint8Array;
+  return doc.output("arraybuffer");
 }
