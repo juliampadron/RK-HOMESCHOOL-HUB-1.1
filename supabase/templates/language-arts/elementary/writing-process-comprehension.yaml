@@ -1,0 +1,243 @@
+metadata:
+  id: writing_process_comprehension
+  title: "Writing Process & Comprehension"
+  subject: language-arts
+  grade_range: [3RD, 4TH, 5TH]
+  duration_minutes: 45
+  standards:
+    - "NYS CCLS W.3.3: Write narratives to develop real or imagined experiences using effective technique"
+    - "NYS CCLS W.4.2: Write informative/explanatory texts to examine a topic and convey ideas clearly"
+    - "NYS CCLS W.5.1: Write opinion pieces on topics or texts, supporting a point of view with reasons and information"
+    - "NYS CCLS RI.3.1: Ask and answer questions to demonstrate understanding of a text"
+    - "NYS CCLS RI.4.3: Explain events, procedures, ideas, or concepts in a historical, scientific, or technical text"
+    - "NYS CCLS RL.5.2: Determine a theme of a story, drama, or poem from details in the text"
+  version: "1.0"
+  created: "2026-02-28"
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"
+    secondary: "#2B59C3"
+    accent: "#FBC440"
+
+layout:
+  template: worksheet.hbs
+  orientation: portrait
+  page_size: letter
+
+levels:
+  "[BELOW]":
+    header:
+      title: "✏️ Write It & Read It! ✏️"
+      subtitle: "Practice writing and understanding stories!"
+      instructions: "Read the short passage below. Then answer the questions and do the writing activity."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Reading** means understanding what you read.
+          **Writing** means sharing your thoughts with words.
+          Good writers use a **beginning**, **middle**, and **end**.
+
+      - type: reading_passage
+        title: "Read This Story"
+        text: |
+          Lily found a tiny puppy near the park. The puppy was cold and hungry.
+          Lily brought the puppy home and gave it food and water.
+          The puppy wagged its tail and licked Lily's hand.
+          Lily smiled. She knew she had found a new best friend.
+
+      - type: comprehension_questions
+        title: "Answer the Questions"
+        items:
+          - question: "Where did Lily find the puppy?"
+            lines: 2
+          - question: "How did Lily help the puppy?"
+            lines: 2
+          - question: "How did the puppy feel at the end of the story? How do you know?"
+            lines: 2
+
+      - type: writing_activity
+        title: "Your Turn to Write!"
+        prompt: "Draw a picture of a pet you have or wish you had. Write 2–3 sentences about it."
+        drawing_space: 150
+        lines: 3
+
+      - type: writing_checklist
+        title: "Check Your Writing"
+        items:
+          - "I wrote a sentence that makes sense."
+          - "I used a capital letter at the beginning."
+          - "I used a period or question mark at the end."
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Read aloud together! Ask your child to retell the story in their own words: "What happened first? Then? At the end?" This builds comprehension and sequencing skills.
+
+  "[STANDARD]":
+    header:
+      title: "✏️ Writing Process & Comprehension Workshop ✏️"
+      subtitle: "Develop your writing skills and deepen your reading comprehension!"
+      instructions: "Complete each section carefully. Use evidence from the passage when answering questions."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **The Writing Process**: Prewrite → Draft → Revise → Edit → Publish
+          **Comprehension**: Understanding what you read by asking WHO, WHAT, WHERE, WHEN, WHY, HOW.
+          **Text Evidence**: Support your answers with specific details from the passage.
+
+      - type: reading_passage
+        title: "Read the Passage"
+        text: |
+          Every year, thousands of monarch butterflies make an incredible journey.
+          They travel up to 3,000 miles from Canada and the United States to their winter home in Mexico.
+          Scientists call this a migration. The butterflies navigate using the sun and Earth's magnetic field.
+          When spring arrives, the butterflies begin the long journey north again.
+          Scientists are still learning how such a small insect can travel so far. Many people work to
+          protect the butterflies' habitat so this amazing migration can continue for future generations.
+
+      - type: comprehension_questions
+        title: "Part 1 – Reading Comprehension"
+        items:
+          - question: "What is the main idea of this passage? Write it in your own words."
+            lines: 2
+          - question: "How far do monarch butterflies travel? Use a detail from the passage in your answer."
+            lines: 2
+          - question: "How do the butterflies navigate during migration?"
+            lines: 2
+          - question: "Why do people work to protect monarch butterfly habitats? What does this tell you about the butterflies?"
+            lines: 3
+
+      - type: vocabulary_activity
+        title: "Part 2 – Vocabulary in Context"
+        items:
+          - word: "migration"
+            sentence: "Scientists call this a migration."
+            prompt: "Based on the passage, what does 'migration' mean? Write a definition in your own words."
+            lines: 2
+          - word: "navigate"
+            sentence: "The butterflies navigate using the sun and Earth's magnetic field."
+            prompt: "What does 'navigate' mean? How do you think the butterflies use the sun to find their way?"
+            lines: 2
+
+      - type: writing_activity
+        title: "Part 3 – Writing Practice"
+        prompt: |
+          **Informative Writing**: Choose a topic you know well (a hobby, an animal, a sport, or a place).
+          Use the writing process to plan and write a short informative paragraph (5–7 sentences).
+          Include: a topic sentence, at least 3 supporting details, and a closing sentence.
+        prewrite:
+          graphic_organizer:
+            type: web
+            center: "My Topic: ________________"
+            branches: ["Detail 1:", "Detail 2:", "Detail 3:", "Closing Idea:"]
+        draft_lines: 8
+
+      - type: writing_checklist
+        title: "Revise & Edit Checklist"
+        items:
+          - "My paragraph has a clear topic sentence."
+          - "I included at least 3 supporting details."
+          - "I have a closing sentence."
+          - "I checked spelling and punctuation."
+          - "My sentences are complete (subject + verb)."
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Discuss nonfiction texts together. Ask: "What is the most interesting fact you learned? What questions do you still have?" This deepens informational comprehension. For writing, encourage your child to share their draft with you — celebrate their ideas!
+
+  "[ADVANCED]":
+    header:
+      title: "✏️ Advanced Writing & Analytical Comprehension ✏️"
+      subtitle: "Analyze complex texts and craft structured written responses!"
+      instructions: "Complete all sections. Support your ideas with specific evidence from the text. Use the full writing process."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Literary Analysis**: Identifying theme, author's purpose, point of view, and text structure.
+          **Opinion/Argument Writing**: State a claim, provide evidence-based reasons, address counterarguments, write a conclusion.
+          **Writing Craft**: Word choice, sentence variety, transitions, and voice distinguish strong writing.
+
+      - type: reading_passage
+        title: "Read the Passage"
+        text: |
+          The ocean covers more than 70 percent of Earth's surface, yet scientists estimate that
+          more than 80 percent of it remains unexplored. Every year, researchers discover new species
+          living in the deep sea—creatures adapted to crushing pressure, total darkness, and near-freezing
+          temperatures. Some scientists argue that exploring the deep ocean is as important as exploring space,
+          because the answers to questions about life, climate, and even medicine may lie hidden beneath the waves.
+          Others caution that deep-sea exploration must be done carefully to avoid disturbing fragile ecosystems
+          that took millions of years to develop. As technology improves, the debate over how—and how much—to
+          explore the deep ocean continues to grow.
+
+      - type: comprehension_questions
+        title: "Part 1 – Analytical Comprehension"
+        items:
+          - question: "What is the central argument of this passage? Identify at least two pieces of evidence the author uses to support it."
+            lines: 4
+          - question: "The passage presents two different perspectives on deep-sea exploration. Summarize each perspective in 1–2 sentences."
+            lines: 4
+          - question: "What does the phrase 'fragile ecosystems' suggest about the deep sea? Why might this be important to consider?"
+            lines: 3
+          - question: "How does the author structure this passage? (Problem/Solution, Compare/Contrast, Cause/Effect, or Description?) Explain with evidence."
+            lines: 3
+
+      - type: vocabulary_analysis
+        title: "Part 2 – Vocabulary & Author's Craft"
+        items:
+          - prompt: "The author writes that creatures are 'adapted to crushing pressure, total darkness, and near-freezing temperatures.' What effect does this descriptive language have on the reader? Why did the author choose these specific words?"
+            lines: 3
+          - prompt: "Find a transition word or phrase in the passage. Explain how it connects ideas."
+            lines: 2
+
+      - type: writing_activity
+        title: "Part 3 – Opinion Writing: Full Writing Process"
+        prompt: |
+          **Prompt**: Should humans prioritize deep-sea exploration or space exploration? Write a well-developed opinion essay (3–4 paragraphs) that:
+          - States a clear claim in the introduction
+          - Provides at least 2 evidence-based reasons with supporting details
+          - Addresses at least one counterargument (opposing view) and responds to it
+          - Ends with a strong conclusion that restates your claim
+        prewrite:
+          graphic_organizer:
+            type: argument_map
+            sections:
+              - label: "My Claim"
+                lines: 2
+              - label: "Reason 1 + Evidence"
+                lines: 3
+              - label: "Reason 2 + Evidence"
+                lines: 3
+              - label: "Counterargument + My Response"
+                lines: 3
+              - label: "Conclusion"
+                lines: 2
+        draft_lines: 20
+
+      - type: writing_checklist
+        title: "Advanced Revise & Edit Checklist"
+        items:
+          - "My introduction has a hook and a clear claim."
+          - "Each body paragraph starts with a topic sentence."
+          - "I used evidence and explained how it supports my claim."
+          - "I addressed and responded to a counterargument."
+          - "My conclusion restates my claim and leaves the reader thinking."
+          - "I used transitions between paragraphs (First, In addition, However, Therefore)."
+          - "I varied my sentence structure (short and long sentences)."
+          - "I checked spelling, grammar, and punctuation."
+
+      - type: reflection
+        prompt: "What is the strongest part of your essay? What would you change if you had more time to revise?"
+        lines: 3
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Engage with your child's writing as a reader — ask genuine questions like "I want to know more about this reason — can you say more?" Encourage reading opinion pieces in newspapers or magazines to study how real writers construct arguments. Discuss the deep-sea vs. space exploration debate together!
+
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "ELA Series – NYS Aligned"
+  right: "Writing Process & Comprehension Grades 3–5"

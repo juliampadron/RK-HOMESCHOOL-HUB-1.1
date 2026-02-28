@@ -1,0 +1,179 @@
+metadata:
+  id: fractions_geometry_basics
+  title: "Fractions & Geometry Basics"
+  subject: mathematics
+  grade_range: [3RD, 4TH, 5TH]
+  duration_minutes: 45
+  standards:
+    - "NYS CCLS 3.NF.1: Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts"
+    - "NYS CCLS 3.NF.3: Explain equivalence of fractions and compare fractions by reasoning about their size"
+    - "NYS CCLS 3.G.1: Understand that shapes in different categories may share attributes and that the shared attributes can define a larger category"
+    - "NYS CCLS 4.NF.1: Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b)"
+    - "NYS CCLS 5.G.3: Understand that attributes belonging to a category of two-dimensional figures also belong to all subcategories"
+  version: "1.0"
+  created: "2026-02-28"
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"
+    secondary: "#2B59C3"
+    accent: "#FBC440"
+
+layout:
+  template: worksheet.hbs
+  orientation: portrait
+  page_size: letter
+
+levels:
+  "[BELOW]":
+    header:
+      title: "🍕 Fractions & Shapes Explorer 🔷"
+      subtitle: "Let's learn about parts of a whole and basic shapes!"
+      instructions: "Use the pictures below to help you answer each question."
+
+    sections:
+      - type: instruction_box
+        content: |
+          A **fraction** shows part of a whole.
+          The **bottom number** tells how many equal parts there are.
+          The **top number** tells how many parts we are talking about.
+
+      - type: fractions_activity
+        title: "Shade the Fraction"
+        items:
+          - prompt: "Shade 1/2 of the shape."
+            shape: rectangle_halves
+          - prompt: "Shade 1/4 of the shape."
+            shape: rectangle_quarters
+          - prompt: "Shade 1/3 of the shape."
+            shape: circle_thirds
+
+      - type: matching_activity
+        title: "Match the Shape to Its Name"
+        pairs:
+          - shape: triangle
+            name: "Triangle – 3 sides"
+          - shape: square
+            name: "Square – 4 equal sides"
+          - shape: rectangle
+            name: "Rectangle – 4 sides, 2 pairs equal"
+          - shape: circle
+            name: "Circle – round, no sides"
+
+      - type: fill_in_blank
+        title: "Complete the Sentences"
+        items:
+          - "A shape with 3 sides is called a _______________."
+          - "1/2 means 1 part out of _______________ equal parts."
+          - "A square has _______________ equal sides."
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Practice fractions at mealtime! Cut a sandwich into halves or quarters and ask your child to identify the fractions.
+
+  "[STANDARD]":
+    header:
+      title: "🍕 Fractions & Geometry Workshop 🔷"
+      subtitle: "Explore fractions and two-dimensional shapes!"
+      instructions: "Complete each section. Show your work where asked."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Fractions** represent equal parts of a whole.
+          **Equivalent fractions** name the same amount: 1/2 = 2/4 = 3/6
+          **Geometry** is the study of shapes, their properties, and how they relate.
+
+      - type: fractions_activity
+        title: "Part 1 – Working with Fractions"
+        items:
+          - prompt: "Write a fraction for the shaded part."
+            shape: shaded_thirds
+            answer_line: "Fraction: ___/___"
+          - prompt: "Circle the equivalent fraction: 1/2 = ?/4"
+            choices: ["1/4", "2/4", "3/4"]
+          - prompt: "Compare using <, >, or =: 3/4 ___ 1/4"
+            answer_line: true
+          - prompt: "Draw a model to show 2/3 of a rectangle."
+            drawing_space: 100
+
+      - type: geometry_activity
+        title: "Part 2 – Geometry Basics"
+        items:
+          - prompt: "Name each shape and list the number of sides."
+            shapes: [triangle, quadrilateral, pentagon, hexagon]
+            table:
+              columns: ["Shape", "Name", "Number of Sides"]
+              rows: 4
+          - prompt: "Which shapes below are quadrilaterals? Circle all that apply."
+            choices: [square, rectangle, triangle, rhombus, circle, parallelogram]
+
+      - type: word_problems
+        title: "Part 3 – Apply Your Knowledge"
+        items:
+          - "Maya has a pizza cut into 8 equal slices. She eats 3 slices. What fraction of the pizza did she eat? What fraction is left?"
+          - "A garden is divided into 4 equal sections. 2 sections have flowers and 2 have vegetables. Are 2/4 and 1/2 equivalent? Explain."
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Explore geometry at home — identify shapes in architecture, tiles, and everyday objects. Ask your child to classify shapes by their properties (number of sides, right angles, equal sides).
+
+  "[ADVANCED]":
+    header:
+      title: "🍕 Fractions & Geometry Deep Dive 🔷"
+      subtitle: "Analyze fractions and geometric relationships!"
+      instructions: "Complete all sections. Justify your reasoning with models or written explanations."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Fraction equivalence**: a/b = (n×a)/(n×b) — multiplying numerator and denominator by the same number gives an equivalent fraction.
+          **Geometric attributes**: Shapes can be categorized by attributes (number of sides, parallel sides, right angles, equal sides).
+          **Hierarchy of shapes**: A square is always a rectangle, but a rectangle is not always a square.
+
+      - type: fractions_deep_dive
+        title: "Part 1 – Fraction Operations & Reasoning"
+        items:
+          - prompt: "Generate three fractions equivalent to 3/5. Explain how you found them."
+            lines: 3
+          - prompt: "Order these fractions from least to greatest: 5/8, 1/2, 3/4, 7/8. Show your strategy."
+            lines: 4
+          - prompt: "Marcus ran 3/4 of a mile on Monday and 5/8 of a mile on Wednesday. On which day did he run farther? How do you know?"
+            lines: 3
+          - prompt: "Create a word problem that requires comparing two fractions with different denominators."
+            lines: 4
+
+      - type: geometry_analysis
+        title: "Part 2 – Classifying & Analyzing Shapes"
+        items:
+          - prompt: "Complete the Venn diagram to sort shapes: Rectangles vs. Rhombuses. What shape belongs in the overlapping section?"
+            diagram: venn_rectangles_rhombuses
+          - prompt: "Explain why a square is always a rhombus but a rhombus is not always a square."
+            lines: 3
+          - prompt: "Draw and label an example of each: right angle, acute angle, obtuse angle. Find one example of each in the classroom or home."
+            drawing_space: 150
+
+      - type: investigation
+        title: "Part 3 – Fraction & Geometry Connection"
+        prompt: |
+          A pizza is cut into equal slices. The whole pizza is a circle.
+          If you cut it into 6 equal slices, what fraction does each slice represent?
+          Each slice is a triangle-like shape called a **sector**.
+          How many sectors would you need to make 1/2 of the pizza? 2/3?
+          Draw a model and write equations to support your answer.
+        drawing_space: 200
+        lines: 4
+
+      - type: reflection
+        prompt: "What is the most important thing you learned about fractions and geometry today? How do you think these ideas connect to real life?"
+        lines: 4
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Deepen fraction understanding with cooking — measuring 1/2 cup, 3/4 cup, etc. For geometry, explore tessellations (tiling patterns) and ask which shapes tile perfectly and why.
+
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "Mathematics Series – NYS Aligned"
+  right: "Fractions & Geometry Grades 3–5"
