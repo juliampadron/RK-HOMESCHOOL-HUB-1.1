@@ -1,0 +1,13 @@
+
+title,slug,subject_tags,grade_level,resource_type,price,file_path,is_member_only,description
+Solar System Explorer,solar-system-explorer,{Science},{3-5},Unit,3.49,pdfs/solar-system-explorer.pdf,false,"A comprehensive unit exploring the planets, moons, and stars in our solar system with hands-on activities."
+Light and Shadows Experiment,light-and-shadows-experiment,{Science},{3-5},Lab,2.99,pdfs/light-and-shadows-experiment.pdf,false,An experiment kit for exploring how light interacts with objects to create shadows.
+Animal Adaptations Slide Deck,animal-adaptations-slide-deck,{Science},{3-5},Presentation,1.99,pdfs/animal-adaptations-slide-deck.pdf,false,A visually engaging slide deck explaining how animals adapt to their environments.
+Water Cycle Storybook,water-cycle-storybook,"{Science,Language Arts}",{3-5},Storybook,0.00,pdfs/water-cycle-storybook.pdf,false,A narrative storybook following a water droplet through the water cycle with illustrations and comprehension questions.
+Earthquake Engineering Challenge,earthquake-engineering-challenge,"{Science,Art}",{3-5},Project,3.99,pdfs/earthquake-engineering-challenge.pdf,false,An art-integrated project where students design and build earthquake-resistant structures.
+Plant Observation Journal,plant-observation-journal,{Science},{3-5},Worksheet,0.00,pdfs/plant-observation-journal.pdf,false,A printable journal for students to record observations of plants over time.
+Ocean Food Web Diagram,ocean-food-web-diagram,{Science},{3-5},Worksheet,1.49,pdfs/ocean-food-web-diagram.pdf,false,A worksheet that guides students to construct and label an ocean food web.
+Simple Machines Game,simple-machines-game,{Science},{3-5},Game,2.49,pdfs/simple-machines-game.pdf,false,A board game that helps students identify and classify different types of simple machines.
+Mysterious Matter Investigation,mysterious-matter-investigation,"{Science,Math}",{3-5},Lab,3.25,pdfs/mysterious-matter-investigation.pdf,false,A lab where students measure and classify different states of matter using math skills.
+Weather Reporter Video Project,weather-reporter-video-project,"{Science,Language Arts,Art}",{3-5},Project,2.75,pdfs/weather-reporter-video-project.pdf,false,A multimedia project where students script and film their own weather report with artistic flair.
+Rock Cycle Coloring Sheet,rock-cycle-coloring-sheet,"{Science,Art}",{3-5},Worksheet,0.99,pdfs/rock-cycle-coloring-sheet.pdf,false,A coloring activity that helps students visualize the stages of the rock cycle.
