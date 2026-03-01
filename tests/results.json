@@ -1,0 +1,596 @@
+[
+  {
+    "category": "Repo Structure",
+    "test": "README.md",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "supabase/migrations/20260226_init_hub.sql",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "supabase/templates/worksheet_template.yml",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "supabase/templates/elementary_science/forces_ramps_motion.yml",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "supabase/templates/middle_science/chemistry_states_of_matter.yml",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "supabase/templates/science/elementary/forces/push-pull-basics.yaml",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": "science_investigation_templates/light_and_shadows_template.md",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Repo Structure",
+    "test": ".github/GITHUB_SECRETS.md",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "20260226_init_hub.sql \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "RBAC role 'guest' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "RBAC role 'registered' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "RBAC role 'verified_family' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "RBAC role 'admin' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "Table 'profiles' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "Table 'hub_resources' defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "profiles column 'id'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "profiles column 'user_id'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "profiles column 'username'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "profiles column 'created_at'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "hub_resources column 'id'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "hub_resources column 'title'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "hub_resources column 'description'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "hub_resources column 'created_at'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "profiles references auth.users",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "SQL Migration",
+    "test": "No hardcoded secrets",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "forces_ramps_motion.yml \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "forces_ramps_motion.yml \u2014 valid YAML",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "forces_ramps_motion.yml \u2014 has 'category' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "forces_ramps_motion.yml \u2014 has 'subject' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "forces_ramps_motion.yml \u2014 has 'levels' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "chemistry_states_of_matter.yml \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "chemistry_states_of_matter.yml \u2014 valid YAML",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "chemistry_states_of_matter.yml \u2014 has 'Title' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "chemistry_states_of_matter.yml \u2014 has 'Subject' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 valid YAML",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 has 'metadata' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 has 'levels' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 has 'branding' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 has 'layout' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics.yaml \u2014 has 'footer' key",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "worksheet_template.yml \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "worksheet_template.yml \u2014 valid YAML",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics \u2014 level '[BELOW]' present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics \u2014 level '[STANDARD]' present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics \u2014 level '[ADVANCED]' present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'id'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'title'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'subject'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'grade_range'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'standards'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'version'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "YAML Templates",
+    "test": "push-pull-basics metadata \u2014 'created'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 file exists",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 non-empty",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '# Light and Shadows Investigation Template'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '## Beginner Level:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '## Intermediate Level:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '## Advanced Level:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '### Materials Needed:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '### Activities:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Markdown Templates",
+    "test": "light_and_shadows_template.md \u2014 contains '### Reflection:'",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "DOCTYPE declaration",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "lang attribute on <html>",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "viewport meta tag",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Page title set",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "SEO description meta",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Open Graph type meta",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Twitter card meta",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Score display element",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Play button",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Reset button",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Staircase container",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Message box",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Print button",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "ARIA label on staircase",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "ARIA label on score board",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Keyboard event (Enter/Space)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Audio context creation",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Sine wave oscillator",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "LocalStorage save",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "LocalStorage load",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Score reset function",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "DOMContentLoaded listener",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "8 solfege steps defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "DO-RE-MI-FA-SOL-LA-TI sequence",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Correct answer feedback",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Wrong answer feedback with replay",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Gentle audio envelope",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Print stylesheet",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Print hides buttons",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Print shows teacher notes",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "RK brand colors defined",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Footer attribution",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Responsive layout (min clamp)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Inline <script> block present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Score increments on correct answer",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Steps disabled after answer",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "category": "Solfege Game",
+    "test": "Random note selection",
+    "status": "PASS",
+    "detail": ""
+  }
+]
