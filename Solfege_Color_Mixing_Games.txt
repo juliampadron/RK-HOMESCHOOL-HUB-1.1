@@ -1,1 +1,182 @@
-Both free games (Solfege + Color Mixing) content here.
+# Solfege & Color Mixing Games - Free Public Games
+
+Two free interactive educational games for the Renaissance Kids Homeschool Platform.
+
+## Games Implemented
+
+### 1. Solfege Staircase 🎵
+**Location:** `/homeschool-hub/solfege-staircase/index.html`
+
+A music ear-training game that teaches children to recognize and sing notes of the major scale.
+
+**Features:**
+- Interactive 8-note musical scale (C4 to C5)
+- Audio Web API for tone generation
+- LocalStorage progress persistence
+- Print-to-worksheet mode
+- Accessibility features (ARIA labels, keyboard support)
+- Renaissance Kids branding
+- Mobile-responsive design
+
+**Learning Objectives:**
+- Ear training
+- Note recognition
+- Solfege singing
+- Musical pitch awareness
+
+**Technical Details:**
+- Pure HTML5/CSS/JavaScript (no backend required)
+- Uses Web Audio API for sine wave tone generation
+- 85 lines of code
+- SEO optimized with Open Graph tags
+
+### 2. Color Mixing Canvas 🎨
+**Location:** `/homeschool-hub/color-mixing-canvas/index.html`
+
+An interactive art game where students mix primary colors to create new colors and learn color theory.
+
+**Features:**
+- HTML5 Canvas API for painting
+- Real-time color mixing algorithm
+- Primary colors: Red, Yellow, Blue + White & Black
+- Unique color tracking (score system)
+- Adjustable brush size
+- Touch and mouse support
+- Print-to-artwork mode
+- LocalStorage progress persistence
+- Color mixing guide with examples
+
+**Learning Objectives:**
+- Color theory fundamentals
+- Primary and secondary colors
+- Tints and shades
+- Fine motor skills
+- Creative expression
+
+**Technical Details:**
+- Pure HTML5/CSS/JavaScript
+- Uses Canvas 2D API
+- Color blending algorithm with 50/50 ratio
+- Mobile-friendly with touch events
+- Device pixel ratio scaling for crisp rendering
+- SEO optimized
+
+## File Structure
+
+```
+homeschool-hub/
+├── solfege-staircase/
+│   └── index.html          # Self-contained game
+└── color-mixing-canvas/
+    └── index.html          # Self-contained game
+```
+
+## Integration with Platform
+
+Both games are designed to work standalone OR within the platform:
+
+### Standalone Mode (Current)
+- Games work independently without authentication
+- LocalStorage tracks individual progress
+- Accessible at direct URLs
+- Perfect for marketing and freemium content
+
+### Platform Integration (Future)
+To integrate with the game enrollment system:
+
+1. **Add Game Records to Database:**
+```sql
+-- Solfege Staircase
+INSERT INTO games (title, slug, description, subject_area, grade_levels, file_path, is_public, requires_enrollment)
+VALUES (
+  'Solfege Staircase',
+  'solfege-staircase',
+  'Climb the musical stairs! A fun, interactive ear-training game that helps children recognize and sing the notes of the major scale.',
+  'Music',
+  'K-8',
+  '/homeschool-hub/solfege-staircase/index.html',
+  true,
+  false
+);
+
+-- Color Mixing Canvas
+INSERT INTO games (title, slug, description, subject_area, grade_levels, file_path, is_public, requires_enrollment)
+VALUES (
+  'Color Mixing Canvas',
+  'color-mixing-canvas',
+  'Mix primary colors to create new colors! Learn color theory through interactive art.',
+  'Arts',
+  'K-5',
+  '/homeschool-hub/color-mixing-canvas/index.html',
+  true,
+  false
+);
+```
+
+2. **Add Progress Tracking:**
+   - Games send progress updates via postMessage API
+   - Platform GamePlayer component receives and stores progress
+   - Example implementation in `/GamePlayer_Component.txt`
+
+3. **Progress Message Format:**
+```javascript
+// In game code, send progress to parent window:
+window.parent.postMessage({
+  type: 'GAME_PROGRESS',
+  score: currentScore,
+  completion: percentComplete,
+  timeSpent: minutesPlayed,
+  data: { customGameData: 'here' }
+}, '*');
+```
+
+## Accessibility Features
+
+Both games include:
+- ARIA labels for screen readers
+- Keyboard navigation support
+- High contrast color schemes
+- Touch and mouse input
+- Semantic HTML structure
+
+## SEO & Social Sharing
+
+Both games have complete Open Graph meta tags:
+- og:title, og:description, og:image
+- Twitter Card support
+- Proper structured data
+
+**Social Media Images:**
+- Solfege: `/images/rk-solfege-share.png`
+- Color Mixing: `/images/rk-color-mixing-share.png`
+
+## Print Functionality
+
+Both games support printing:
+- **Print Mode Activated:** Cmd/Ctrl + P or Print button
+- **CSS @media print** rules hide interactive elements
+- **Worksheet Layout:** Student name field, date field, clean layout
+- **Solfege:** Prints staircase as worksheet
+- **Color Mixing:** Prints canvas as artwork
+
+## Brand Colors
+
+Renaissance Kids color palette used:
+- RK Green: `#2F6B65`
+- RK Yellow: `#FBC440`
+- RK Orange: `#F05A22`
+
+## Future Enhancements
+
+Potential additions:
+1. More difficulty levels
+2. Multiplayer challenges
+3. Achievements and badges
+4. Parent/teacher dashboard integration
+5. NYS Learning Standards mapping
+6. Additional games (rhythm, harmony, complementary colors, etc.)
+
+## License
+
+These games are part of the Renaissance Kids Homeschool Platform.
+© 2026 Renaissance Kids. All rights reserved.
