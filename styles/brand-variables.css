@@ -1,0 +1,214 @@
+/**
+ * Renaissance Kids Brand Variables
+ * Version: 1.0
+ * Last Updated: March 2026
+ *
+ * This file contains all brand colors, typography, and design tokens
+ * following the Renaissance Kids Brand Style Guide.
+ *
+ * Usage: Import this file in your HTML or CSS:
+ * <link rel="stylesheet" href="/styles/brand-variables.css">
+ */
+
+:root {
+  /* ==================== PRIMARY COLORS ==================== */
+  --rk-teal: #2F6B65;      /* Primary brand color - headers, buttons, backgrounds */
+  --rk-peach: #F7C4A5;     /* Warm accents, call-out boxes, friendly highlights */
+  --rk-navy: #1C1C1C;      /* Body text, icons, borders */
+
+  /* ==================== ACCENT COLORS ==================== */
+  --rk-red: #E92929;       /* Subject categorization, game elements */
+  --rk-blue: #2B59C3;      /* Subject categorization, game elements */
+  --rk-yellow: #FFE600;    /* Subject categorization, game elements */
+  --rk-green: #48B749;     /* Subject categorization, game elements */
+  --rk-purple: #8028A0;    /* Subject categorization, game elements */
+  --rk-orange: #F05A22;    /* Subject categorization, game elements */
+
+  /* ==================== NEUTRAL COLORS ==================== */
+  --rk-white: #FFFFFF;
+  --rk-bg: #FDFBF7;        /* Off-white background for warmth */
+  --rk-panel: #FFFFFF;     /* White panels and cards */
+
+  /* ==================== TYPOGRAPHY ==================== */
+  --font-heading: "Comic Sans MS", Chalkboard, cursive;
+  --font-body: "Century Gothic", Arial, sans-serif;
+  --font-code: Monaco, Courier, monospace;
+
+  /* Font Sizes */
+  --font-size-base: 16px;
+  --font-size-large: 18px;
+  --font-size-small: 14px;
+  --font-size-footnote: 12px;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ==================== SPACING ==================== */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* ==================== BORDER RADIUS ==================== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* ==================== SHADOWS ==================== */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 18px 40px rgba(47, 107, 101, 0.18);
+
+  /* ==================== TRANSITIONS ==================== */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+
+  /* ==================== Z-INDEX LAYERS ==================== */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-notification: 300;
+  --z-tooltip: 400;
+}
+
+/* ==================== COMPONENT CLASSES ==================== */
+
+/* Primary Button */
+.rk-btn-primary {
+  background: var(--rk-teal);
+  color: var(--rk-white);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.rk-btn-primary:hover {
+  background: #26544f;
+  box-shadow: var(--shadow-md);
+}
+
+.rk-btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Secondary Button */
+.rk-btn-secondary {
+  background: var(--rk-white);
+  color: var(--rk-teal);
+  border: 2px solid var(--rk-teal);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.rk-btn-secondary:hover {
+  background: var(--rk-teal);
+  color: var(--rk-white);
+}
+
+/* Card Component */
+.rk-card {
+  background: var(--rk-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  transition: box-shadow var(--transition-normal);
+}
+
+.rk-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Callout/Highlight Box */
+.rk-callout {
+  background: var(--rk-peach);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--rk-teal);
+  margin: var(--spacing-md) 0;
+}
+
+/* Form Input */
+.rk-input {
+  border: 2px solid var(--rk-navy);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  width: 100%;
+  transition: border-color var(--transition-normal);
+}
+
+.rk-input:focus {
+  outline: none;
+  border-color: var(--rk-teal);
+  box-shadow: 0 0 0 3px rgba(47, 107, 101, 0.1);
+}
+
+/* Typography Classes */
+.rk-heading {
+  font-family: var(--font-heading);
+  color: var(--rk-teal);
+  line-height: var(--line-height-tight);
+}
+
+.rk-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--rk-navy);
+  line-height: var(--line-height-normal);
+}
+
+.rk-code {
+  font-family: var(--font-code);
+  background: var(--rk-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Footer */
+.rk-footer {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--rk-navy);
+  font-family: var(--font-body);
+  font-size: var(--font-size-small);
+  border-top: 2px solid var(--rk-peach);
+}
+
+/* Utility Classes */
+.rk-text-center { text-align: center; }
+.rk-text-left { text-align: left; }
+.rk-text-right { text-align: right; }
+
+.rk-mt-sm { margin-top: var(--spacing-sm); }
+.rk-mt-md { margin-top: var(--spacing-md); }
+.rk-mt-lg { margin-top: var(--spacing-lg); }
+
+.rk-mb-sm { margin-bottom: var(--spacing-sm); }
+.rk-mb-md { margin-bottom: var(--spacing-md); }
+.rk-mb-lg { margin-bottom: var(--spacing-lg); }
+
+.rk-p-sm { padding: var(--spacing-sm); }
+.rk-p-md { padding: var(--spacing-md); }
+.rk-p-lg { padding: var(--spacing-lg); }
