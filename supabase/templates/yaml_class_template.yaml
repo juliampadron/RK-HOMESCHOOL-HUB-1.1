@@ -1,0 +1,325 @@
+---
+# Renaissance Kids Class Template
+# This YAML template provides a structured format for creating educational classes/lessons
+# Use this template to design differentiated learning experiences across BELOW, STANDARD, and ADVANCED levels
+
+metadata:
+  id: [unique_class_id]
+  title: "[Class Title]"
+  subject: [science|math|language_arts|social_studies|art|music]
+  grade_range: [K, 1ST, 2ND, 3RD, 4TH, 5TH, 6TH, 7TH, 8TH]
+  duration_minutes: [30|45|60|90]
+  standards:
+    - "[Educational Standard 1]"
+    - "[Educational Standard 2]"
+  version: "1.0"
+  created: "[YYYY-MM-DD]"
+  author: "[Author Name]"
+  tags: [tag1, tag2, tag3]
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"    # RK Orange
+    secondary: "#2B59C3"  # RK Blue
+    accent: "#FBC440"     # RK Yellow
+  logo: renaissance-kids-logo.svg
+
+layout:
+  template: [lab-report.hbs|worksheet.hbs|lesson-plan.hbs|activity.hbs]
+  orientation: [portrait|landscape]
+  page_size: [letter|legal|A4]
+  margins: [normal|narrow|wide]
+
+# Class Overview
+overview:
+  description: |
+    [Brief description of the class/lesson - 2-3 sentences explaining what students will learn]
+
+  learning_objectives:
+    - "[Objective 1: Students will be able to...]"
+    - "[Objective 2: Students will be able to...]"
+    - "[Objective 3: Students will be able to...]"
+
+  materials:
+    required:
+      - "[Material 1]"
+      - "[Material 2]"
+      - "[Material 3]"
+    optional:
+      - "[Optional Material 1]"
+      - "[Optional Material 2]"
+
+  preparation:
+    - "[Preparation step 1]"
+    - "[Preparation step 2]"
+
+  vocabulary:
+    - term: "[Term 1]"
+      definition: "[Definition of term 1]"
+    - term: "[Term 2]"
+      definition: "[Definition of term 2]"
+
+# Differentiated Instruction Levels
+levels:
+  "[BELOW]":
+    # For students working below grade level - simplified concepts, more scaffolding
+    header:
+      title: "[Class Title - Simplified]"
+      subtitle: "[Engaging subtitle for younger/struggling learners]"
+      instructions: "[Clear, simple instructions]"
+
+    sections:
+      - type: warm_up
+        title: "[Warm-up Activity Title]"
+        duration: 5
+        content: |
+          [Warm-up activity description with step-by-step guidance]
+
+      - type: instruction_box
+        content: |
+          **[Key Concept 1]** - [Simple explanation]
+          **[Key Concept 2]** - [Simple explanation]
+
+      - type: guided_activity
+        title: "[Main Activity Title]"
+        duration: 15
+        steps:
+          - "[Step 1 with visual support]"
+          - "[Step 2 with visual support]"
+          - "[Step 3 with visual support]"
+
+      - type: drawing_space
+        title: "[Drawing/Visual Activity]"
+        height: 200
+        prompt: "[What students should draw or illustrate]"
+
+      - type: reflection
+        title: "What I Learned"
+        prompts:
+          - "I learned that _____________________"
+          - "My favorite part was _______________"
+
+      - type: parent_connection
+        content: |
+          **For Parents:** [Tips for extending learning at home with simplified concepts]
+
+  "[STANDARD]":
+    # For students working at grade level - standard curriculum expectations
+    header:
+      title: "[Class Title]"
+      subtitle: "[Engaging subtitle]"
+      instructions: "[Clear instructions appropriate for grade level]"
+
+    sections:
+      - type: warm_up
+        title: "[Warm-up Activity Title]"
+        duration: 5
+        content: |
+          [Warm-up activity to activate prior knowledge]
+
+      - type: instruction_box
+        content: |
+          **[Key Concept]** - [Grade-appropriate explanation]
+
+          [Additional context or examples]
+
+      - type: investigation
+        title: "[Investigation/Experiment Title]"
+        duration: 20
+        hypothesis: "I predict that _______________________________"
+        steps:
+          - "[Step 1]"
+          - "[Step 2]"
+          - "[Step 3]"
+          - "[Step 4]"
+
+      - type: data_collection
+        title: "[Data Collection Section]"
+        format: [table|chart|diagram|writing]
+        prompt: "[Instructions for recording observations/data]"
+
+      - type: analysis
+        title: "Analysis & Reflection"
+        content: |
+          **What patterns did you notice?**
+          _________________________________________________
+
+          **Why do you think this happened?**
+          _________________________________________________
+
+          **How does this connect to [concept]?**
+          _________________________________________________
+
+      - type: writing_prompt
+        question: "[Open-ended question requiring critical thinking]"
+        lines: 4
+
+      - type: parent_connection
+        content: |
+          **For Parents:** [Tips for extending learning and connecting to real-world applications]
+
+  "[ADVANCED]":
+    # For students working above grade level - more complex, requires higher-order thinking
+    header:
+      title: "[Class Title - Extended]"
+      subtitle: "[Challenging, thought-provoking subtitle]"
+      instructions: "[Instructions emphasizing independent thinking and complex application]"
+
+    sections:
+      - type: warm_up
+        title: "[Challenging Warm-up]"
+        duration: 5
+        content: |
+          [Thought-provoking question or scenario to engage advanced learners]
+
+      - type: instruction_box
+        content: |
+          **[Advanced Concept]** - [Detailed explanation with connections to broader ideas]
+
+          [Additional complexity, multiple perspectives, or deeper context]
+
+      - type: investigation
+        title: "[Complex Investigation Title]"
+        duration: 25
+        research_question: "[Open-ended research question]"
+        hypothesis: |
+          Based on [background knowledge], I hypothesize that _______________
+          because ________________________________________________
+
+        steps:
+          - "[Design step - students plan their own approach]"
+          - "[Data collection with multiple trials or variables]"
+          - "[Analysis requiring calculations or comparisons]"
+          - "[Draw conclusions and identify limitations]"
+
+      - type: data_table
+        title: "[Detailed Data Table]"
+        columns: ["Variable 1", "Variable 2", "Trial 1", "Trial 2", "Trial 3", "Average", "Analysis"]
+        rows: 5
+
+      - type: analysis
+        content: |
+          **Analyze your results:**
+          _________________________________________________
+
+          **What variables affected your outcome?**
+          _________________________________________________
+
+          **How does this relate to [broader concept/real-world application]?**
+          _________________________________________________
+
+          **What would happen if you changed [specific variable]?**
+          _________________________________________________
+
+      - type: extension_challenge
+        title: "Challenge: Take It Further"
+        content: |
+          [Open-ended challenge requiring creativity, research, or complex application]
+
+          [Guidance for approaching the challenge]
+
+      - type: writing_prompt
+        question: "[Complex, multi-part question requiring synthesis and evaluation]"
+        lines: 6
+        rubric:
+          - "Clear thesis or claim"
+          - "Evidence from investigation"
+          - "Logical reasoning"
+          - "Connections to broader concepts"
+
+      - type: parent_connection
+        content: |
+          **For Parents:** [Tips for supporting advanced learners, suggesting additional resources or real-world applications]
+
+# Assessment & Evaluation
+assessment:
+  formative:
+    - "[Observation checkpoint 1]"
+    - "[Observation checkpoint 2]"
+    - "[Quick check question]"
+
+  summative:
+    criteria:
+      - name: "[Skill/Knowledge 1]"
+        levels: ["Emerging", "Developing", "Proficient", "Advanced"]
+      - name: "[Skill/Knowledge 2]"
+        levels: ["Emerging", "Developing", "Proficient", "Advanced"]
+
+  self_reflection:
+    prompts:
+      - "What was challenging for me today?"
+      - "What am I proud of?"
+      - "What would I like to learn more about?"
+
+# Extension Activities
+extensions:
+  home_connection:
+    - "[Activity families can do at home]"
+    - "[Questions for family discussion]"
+
+  cross_curricular:
+    - subject: "[Subject]"
+      activity: "[How this connects to another subject area]"
+    - subject: "[Subject]"
+      activity: "[How this connects to another subject area]"
+
+  technology_integration:
+    - "[Digital tool or resource]"
+    - "[Online simulation or game]"
+
+  real_world_application:
+    - "[How this concept appears in daily life]"
+    - "[Career connection]"
+
+# Resources & References
+resources:
+  videos:
+    - title: "[Video Title]"
+      url: "[URL]"
+      duration: "[Duration]"
+
+  websites:
+    - title: "[Website Name]"
+      url: "[URL]"
+      description: "[Brief description]"
+
+  books:
+    - title: "[Book Title]"
+      author: "[Author]"
+      isbn: "[ISBN]"
+
+  printables:
+    - "[Worksheet 1.pdf]"
+    - "[Template 2.pdf]"
+
+# Footer
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "[Series Name]"
+  right: "[Topic/Unit]"
+  contact: "(845) 452-4225 · renkids.org"
+
+# Notes for Instructors
+instructor_notes:
+  - "[Tip 1 for successful implementation]"
+  - "[Common misconception to address]"
+  - "[Modification suggestion for special needs]"
+  - "[Time management tip]"
+
+# Accessibility & Accommodations
+accommodations:
+  visual:
+    - "[Support for students with visual impairments]"
+
+  auditory:
+    - "[Support for students with hearing impairments]"
+
+  physical:
+    - "[Support for students with physical limitations]"
+
+  learning:
+    - "[Support for students with learning differences]"
+
+  language:
+    - "[Support for English language learners]"
