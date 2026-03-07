@@ -4,13 +4,14 @@ metadata:
   subject: language-arts
   grade_range: [3RD, 4TH, 5TH]
   duration_minutes: 45
+  standards_framework: "NYS Next Generation Learning Standards"
   standards:
-    - "NYS CCLS W.3.3: Write narratives to develop real or imagined experiences using effective technique"
-    - "NYS CCLS W.4.2: Write informative/explanatory texts to examine a topic and convey ideas clearly"
-    - "NYS CCLS W.5.1: Write opinion pieces on topics or texts, supporting a point of view with reasons and information"
-    - "NYS CCLS RI.3.1: Ask and answer questions to demonstrate understanding of a text"
-    - "NYS CCLS RI.4.3: Explain events, procedures, ideas, or concepts in a historical, scientific, or technical text"
-    - "NYS CCLS RL.5.2: Determine a theme of a story, drama, or poem from details in the text"
+    - "NY-3W3: Write narratives to develop real or imagined experiences or events using effective technique, descriptive details, and clear event sequences"
+    - "NY-4W2: Write informative/explanatory texts to examine a topic and convey ideas and information clearly"
+    - "NY-5W1: Write opinion pieces on topics or texts, supporting a point of view with reasons and information"
+    - "NY-3RI1: Ask and answer questions to demonstrate understanding of a text, referring explicitly to the text as the basis for the answers"
+    - "NY-4RI3: Explain events, procedures, ideas, or concepts in a historical, scientific, or technical text, including what happened and why, based on specific information in the text"
+    - "NY-5RL2: Determine a theme of a story, drama, or poem from details in the text, including how characters respond to challenges or how the speaker in a poem reflects upon a topic; summarize the text"
   version: "1.0"
   created: "2026-02-28"
 

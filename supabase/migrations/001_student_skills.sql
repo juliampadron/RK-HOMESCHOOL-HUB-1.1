@@ -1,5 +1,8 @@
 -- Migration: 001_student_skills
 -- Purpose: Track student skill mastery levels and alignments to NYS standards
+-- standard_code format: canonical NY- prefix per NYS Next Generation Learning Standards
+--   Mathematics example: NY-3.NF.A.1
+--   ELA example:         NY-3W3
 
 CREATE TABLE student_skills (
     id SERIAL PRIMARY KEY,

@@ -4,12 +4,13 @@ metadata:
   subject: mathematics
   grade_range: [3RD, 4TH, 5TH]
   duration_minutes: 45
+  standards_framework: "NYS Next Generation Learning Standards"
   standards:
-    - "NYS CCLS 3.NF.1: Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts"
-    - "NYS CCLS 3.NF.3: Explain equivalence of fractions and compare fractions by reasoning about their size"
-    - "NYS CCLS 3.G.1: Understand that shapes in different categories may share attributes and that the shared attributes can define a larger category"
-    - "NYS CCLS 4.NF.1: Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b)"
-    - "NYS CCLS 5.G.3: Understand that attributes belonging to a category of two-dimensional figures also belong to all subcategories"
+    - "NY-3.NF.A.1: Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b"
+    - "NY-3.NF.A.3: Explain equivalence of fractions in special cases, and compare fractions by reasoning about their size"
+    - "NY-3.G.A.1: Understand that shapes in different categories may share attributes, and that the shared attributes can define a larger category"
+    - "NY-4.NF.A.1: Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b) by using visual fraction models, with attention to how the number and size of the parts differ"
+    - "NY-5.G.B.3: Understand that attributes belonging to a category of two-dimensional figures also belong to all subcategories of that category"
   version: "1.0"
   created: "2026-02-28"
 

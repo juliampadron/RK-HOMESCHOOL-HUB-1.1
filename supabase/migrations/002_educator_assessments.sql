@@ -1,5 +1,8 @@
 -- Migration: 002_educator_assessments
 -- Purpose: Track assessments and progress monitoring in compliance with IHIP standards
+-- standards_addressed format: canonical NY- prefix per NYS Next Generation Learning Standards
+--   Mathematics example: NY-3.NF.A.1
+--   ELA example:         NY-3W3
 
 CREATE TABLE educator_assessments (
     id SERIAL PRIMARY KEY,

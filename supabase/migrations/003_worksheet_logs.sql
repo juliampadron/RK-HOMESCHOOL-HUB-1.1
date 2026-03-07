@@ -1,5 +1,8 @@
 -- Migration: 003_worksheet_logs
 -- Purpose: Log generated worksheets and capture students' completion trends for analytics
+-- standards_covered format: canonical NY- prefix per NYS Next Generation Learning Standards
+--   Mathematics example: NY-3.NF.A.1
+--   ELA example:         NY-3W3
 
 CREATE TABLE worksheet_logs (
     id SERIAL PRIMARY KEY,
