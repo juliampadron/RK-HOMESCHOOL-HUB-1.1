@@ -1,1 +1,289 @@
-GamePlayer component content here.
+# Game Player Component
+
+This React component loads and displays HTML games with RLS-based access control.
+
+## Implementation
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+interface GamePlayerProps {
+  gameId: string;
+  studentId: string;
+  onProgressUpdate?: (progress: any) => void;
+}
+
+export default function GamePlayer({ gameId, studentId, onProgressUpdate }: GamePlayerProps) {
+  const [game, setGame] = useState<any>(null);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<any>(null);
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    async function loadGame() {
+      try {
+        // Fetch game details
+        const { data: gameData, error: gameError } = await supabase
+          .from('games')
+          .select('*')
+          .eq('id', gameId)
+          .single();
+
+        if (gameError) throw gameError;
+
+        setGame(gameData);
+
+        // Check if game is public or if student has access
+        if (gameData.is_public) {
+          setHasAccess(true);
+        } else {
+          // Check enrollment
+          const { data: enrollment, error: enrollmentError } = await supabase
+            .from('game_enrollments')
+            .select('*')
+            .eq('game_id', gameId)
+            .eq('student_id', studentId)
+            .single();
+
+          if (enrollmentError && enrollmentError.code !== 'PGRST116') {
+            throw enrollmentError;
+          }
+
+          setHasAccess(!!enrollment);
+        }
+
+        // Fetch student progress
+        const { data: progressData } = await supabase
+          .from('student_progress')
+          .select('*')
+          .eq('game_id', gameId)
+          .eq('student_id', studentId)
+          .single();
+
+        setProgress(progressData);
+
+      } catch (err: any) {
+        console.error('Error loading game:', err);
+        setError(err.message || 'Failed to load game');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadGame();
+  }, [gameId, studentId]);
+
+  // Listen for messages from game iframe to track progress
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data.type === 'GAME_PROGRESS') {
+        const { score, completion, timeSpent } = event.data;
+
+        // Update progress in database
+        const { error } = await supabase
+          .from('student_progress')
+          .upsert({
+            student_id: studentId,
+            game_id: gameId,
+            score,
+            completion_percentage: completion,
+            time_spent_minutes: timeSpent,
+            attempts: (progress?.attempts || 0) + 1,
+            last_played_at: new Date().toISOString(),
+            progress_data: event.data.data || {},
+          });
+
+        if (!error && onProgressUpdate) {
+          onProgressUpdate(event.data);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [gameId, studentId, progress, onProgressUpdate]);
+
+  if (loading) {
+    return (
+      <div className="game-player-loading">
+        <div className="spinner"></div>
+        <p>Loading game...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="game-player-error">
+        <h3>Error Loading Game</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="game-player-locked">
+        <div className="lock-icon">🔒</div>
+        <h3>{game?.title}</h3>
+        <p>This game requires enrollment in a class to access.</p>
+        <p>Browse our available classes to unlock this game!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="game-player-container">
+      <div className="game-header">
+        <h2>{game?.title}</h2>
+        {progress && (
+          <div className="progress-stats">
+            <span>Best Score: {progress.score}</span>
+            <span>Completion: {progress.completion_percentage}%</span>
+            <span>Time Played: {progress.time_spent_minutes}min</span>
+          </div>
+        )}
+      </div>
+
+      <iframe
+        src={game?.file_path}
+        className="game-iframe"
+        title={game?.title}
+        sandbox="allow-scripts allow-same-origin"
+        allow="autoplay; fullscreen"
+      />
+
+      <style jsx>{`
+        .game-player-container {
+          width: 100%;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          background: #fdfbf7;
+        }
+
+        .game-header {
+          background: #2F6B65;
+          color: white;
+          padding: 16px 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .game-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+        }
+
+        .progress-stats {
+          display: flex;
+          gap: 20px;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        .game-iframe {
+          flex: 1;
+          border: none;
+          width: 100%;
+        }
+
+        .game-player-loading,
+        .game-player-error,
+        .game-player-locked {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 400px;
+          padding: 40px;
+          text-align: center;
+        }
+
+        .spinner {
+          width: 50px;
+          height: 50px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #2F6B65;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .lock-icon {
+          font-size: 64px;
+          margin-bottom: 20px;
+        }
+
+        .game-player-error {
+          color: #d32f2f;
+        }
+
+        .game-player-locked {
+          background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+          border-radius: 12px;
+        }
+      `}</style>
+    </div>
+  );
+}
+```
+
+## Usage
+
+```tsx
+import GamePlayer from '@/components/GamePlayer';
+
+// In your page component:
+<GamePlayer
+  gameId="game-uuid-here"
+  studentId="student-uuid-here"
+  onProgressUpdate={(progress) => console.log('Progress updated:', progress)}
+/>
+```
+
+## Game Communication Protocol
+
+Games should send progress updates to the parent window:
+
+```javascript
+// In your game code:
+window.parent.postMessage({
+  type: 'GAME_PROGRESS',
+  score: currentScore,
+  completion: percentComplete,
+  timeSpent: minutesPlayed,
+  data: { customData: 'here' }
+}, '*');
+```
+
+## Features
+
+- **RLS-Based Access Control**: Checks game_enrollments table for student access
+- **Public Game Support**: Automatically grants access to public games
+- **Progress Tracking**: Records score, completion %, time spent, attempts
+- **Real-time Updates**: Uses postMessage API for game-to-platform communication
+- **Responsive Design**: Full-screen game player with header stats
+- **Secure Iframe**: Sandboxed with appropriate permissions
+
+## Database Integration
+
+This component integrates with:
+- `games` table: Game metadata and access rules
+- `game_enrollments` table: Student access permissions (RLS enforced)
+- `student_progress` table: Progress tracking and analytics

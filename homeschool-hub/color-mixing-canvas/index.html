@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>🎨 Color Mixing Canvas · Renaissance Kids</title>
+
+  <!-- SEO -->
+  <meta name="title" content="🎨 Color Mixing Canvas · Renaissance Kids">
+  <meta name="description" content="Mix primary colors to create new colors! Learn color theory through interactive art. Perfect for young artists. Free from Renaissance Kids.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.renkids.org/homeschool-hub/color-mixing-canvas">
+  <meta property="og:title" content="🎨 Color Mixing Canvas · Renaissance Kids">
+  <meta property="og:description" content="Mix primary colors to create new colors! Learn color theory through interactive art.">
+  <meta property="og:image" content="https://www.renkids.org/images/rk-color-mixing-share.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="🎨 Color Mixing Canvas · Renaissance Kids">
+  <meta name="twitter:description" content="Mix primary colors to create new colors! Learn color theory through interactive art.">
+  <meta name="twitter:image" content="https://www.renkids.org/images/rk-color-mixing-share.png">
+
+  <style>
+    :root{
+      --rk-green:#2F6B65;
+      --rk-yellow:#FBC440;
+      --rk-orange:#F05A22;
+      --bg:#fdfbf7;
+      --panel:#ffffff;
+      --ink:#1c1c1c;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display:flex;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .game-container{
+      width:min(960px, 100%);
+      background: var(--panel);
+      border-radius: 28px;
+      border: 3px solid rgba(47,107,101,.18);
+      box-shadow: 0 18px 40px rgba(47,107,101,.18);
+      overflow:hidden;
+    }
+
+    header{
+      background: var(--rk-green);
+      color:#fff;
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom: 6px solid var(--rk-yellow);
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    .brand .badge{
+      width:44px;height:44px;border-radius:14px;
+      background:#fff;
+      display:grid;place-items:center;
+      color: var(--rk-orange);
+      font-size:20px;
+      box-shadow:0 6px 14px rgba(0,0,0,.12);
+    }
+
+    .score-board{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      background: rgba(255,255,255,.12);
+      padding:10px 14px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.20);
+    }
+
+    .score-pill{
+      background: var(--rk-yellow);
+      color:#1c1c1c;
+      padding:6px 12px;
+      border-radius:999px;
+      border:2px solid rgba(0,0,0,.25);
+      min-width:44px;
+      text-align:center;
+    }
+
+    main{ padding:18px 18px 22px; }
+
+    .message{
+      background:#fff7e6;
+      border:2px solid rgba(251,196,64,.55);
+      border-radius:18px;
+      padding:14px 14px;
+      font-weight:650;
+      margin-bottom:14px;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .color-palette{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .color-btn{
+      border:3px solid rgba(0,0,0,.25);
+      border-radius:18px;
+      padding:16px;
+      font-weight:800;
+      cursor:pointer;
+      text-align:center;
+      transition: transform 0.1s;
+      font-size:14px;
+    }
+
+    .color-btn:hover{
+      transform: scale(1.05);
+    }
+
+    .color-btn:active{
+      transform: scale(0.95);
+    }
+
+    .color-btn.selected{
+      border-width:4px;
+      box-shadow:0 0 0 4px var(--rk-yellow);
+    }
+
+    #canvas{
+      width:100%;
+      height:400px;
+      border:3px solid rgba(47,107,101,.25);
+      border-radius:18px;
+      cursor:crosshair;
+      background:#fff;
+      touch-action:none;
+    }
+
+    .btn{
+      border:2px solid rgba(0,0,0,.25);
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+      background:#fff;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      background: var(--rk-orange);
+      color:#fff;
+      border-color: rgba(0,0,0,.25);
+    }
+
+    .btn-secondary{
+      background: var(--rk-yellow);
+      color:#1c1c1c;
+    }
+
+    .mixing-guide{
+      margin-top:16px;
+      padding:14px;
+      background: rgba(47,107,101,.08);
+      border-radius:18px;
+      border:2px solid rgba(47,107,101,.18);
+    }
+
+    .mixing-guide h3{
+      margin:0 0 10px 0;
+      font-size:16px;
+      color: var(--rk-green);
+    }
+
+    .mix-examples{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap:10px;
+    }
+
+    .mix-example{
+      padding:8px;
+      background:#fff;
+      border-radius:10px;
+      font-size:13px;
+      text-align:center;
+    }
+
+    .footer-note{
+      padding:12px 18px 18px;
+      color: rgba(0,0,0,.55);
+      font-weight:650;
+      text-align:center;
+    }
+
+    @media print {
+      .controls, .btn, .footer-note, .score-board { display: none !important; }
+      .game-container { border: 2px solid #2F6B65 !important; box-shadow: none !important; }
+      header::before {
+        content: "Student Name: __________________________  Date: ____________";
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-container">
+    <header>
+      <div class="brand">
+        <div class="badge" aria-hidden="true">🎨</div>
+        <div>
+          <div style="font-size:1.05rem;">Renaissance Kids</div>
+          <div style="opacity:.9;font-weight:700;font-size:.92rem;">Color Mixing Canvas</div>
+        </div>
+      </div>
+
+      <div class="score-board" aria-label="Colors Created">
+        ✨ Colors
+        <span id="scoreDisplay" class="score-pill">0</span>
+      </div>
+    </header>
+
+    <main>
+      <div id="messageBox" class="message">
+        Choose a color from the palette, then paint on the canvas! Mix colors by layering them.
+      </div>
+
+      <div class="color-palette" id="colorPalette">
+        <div class="color-btn selected" data-color="255,0,0" style="background:rgb(255,0,0);color:#fff;" tabindex="0">
+          Red
+        </div>
+        <div class="color-btn" data-color="255,255,0" style="background:rgb(255,255,0);color:#1c1c1c;" tabindex="0">
+          Yellow
+        </div>
+        <div class="color-btn" data-color="0,0,255" style="background:rgb(0,0,255);color:#fff;" tabindex="0">
+          Blue
+        </div>
+        <div class="color-btn" data-color="255,255,255" style="background:rgb(255,255,255);color:#1c1c1c;border-color:#666;" tabindex="0">
+          White
+        </div>
+        <div class="color-btn" data-color="0,0,0" style="background:rgb(0,0,0);color:#fff;" tabindex="0">
+          Black
+        </div>
+      </div>
+
+      <canvas id="canvas"></canvas>
+
+      <div class="controls">
+        <button id="clearBtn" class="btn btn-secondary">🗑️ Clear Canvas</button>
+        <button class="btn" onclick="window.print()">🖨️ Print Artwork</button>
+        <label style="display:flex;align-items:center;gap:8px;padding:0 12px;">
+          <span>Brush Size:</span>
+          <input type="range" id="brushSize" min="5" max="50" value="20" style="width:120px;">
+          <span id="brushSizeValue">20</span>
+        </label>
+      </div>
+
+      <div class="mixing-guide">
+        <h3>🌈 Color Mixing Guide</h3>
+        <div class="mix-examples">
+          <div class="mix-example">Red + Yellow = <strong>Orange</strong></div>
+          <div class="mix-example">Yellow + Blue = <strong>Green</strong></div>
+          <div class="mix-example">Blue + Red = <strong>Purple</strong></div>
+          <div class="mix-example">White + Color = <strong>Lighter</strong></div>
+          <div class="mix-example">Black + Color = <strong>Darker</strong></div>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer-note">
+      "Light up learning through the arts." · renkids.org · (845) 452-4225
+    </div>
+  </div>
+
+  <script>
+    // ====== CANVAS SETUP ======
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const messageBox = document.getElementById('messageBox');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    const brushSizeInput = document.getElementById('brushSize');
+    const brushSizeValue = document.getElementById('brushSizeValue');
+
+    // Set canvas size
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ====== GAME STATE ======
+    let currentColor = [255, 0, 0];
+    let isDrawing = false;
+    let brushSize = 20;
+    let uniqueColors = new Set();
+    let score = parseInt(localStorage.getItem('rk_colorMixingScore'), 10) || 0;
+
+    scoreDisplay.textContent = String(score);
+    if (score > 0) {
+      messageBox.textContent = `👋 Welcome back! You've created ${score} unique colors. Keep painting!`;
+    }
+
+    // ====== COLOR PALETTE ======
+    const colorButtons = document.querySelectorAll('.color-btn');
+    colorButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        currentColor = btn.dataset.color.split(',').map(Number);
+        messageBox.textContent = `Selected ${btn.textContent.trim()}! Start painting to mix colors.`;
+      });
+
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
+    // ====== BRUSH SIZE ======
+    brushSizeInput.addEventListener('input', (e) => {
+      brushSize = parseInt(e.target.value, 10);
+      brushSizeValue.textContent = brushSize;
+    });
+
+    // ====== DRAWING FUNCTIONS ======
+    function getCanvasPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+      const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+      return { x, y };
+    }
+
+    function mixColors(color1, color2, ratio = 0.5) {
+      return [
+        Math.round(color1[0] * (1 - ratio) + color2[0] * ratio),
+        Math.round(color1[1] * (1 - ratio) + color2[1] * ratio),
+        Math.round(color1[2] * (1 - ratio) + color2[2] * ratio),
+      ];
+    }
+
+    function draw(x, y) {
+      // Get color at point for mixing
+      const imageData = ctx.getImageData(x * window.devicePixelRatio, y * window.devicePixelRatio, 1, 1);
+      const existingColor = [imageData.data[0], imageData.data[1], imageData.data[2]];
+
+      // Mix with existing color
+      const mixedColor = existingColor[0] === 255 && existingColor[1] === 255 && existingColor[2] === 255
+        ? currentColor
+        : mixColors(existingColor, currentColor, 0.5);
+
+      ctx.fillStyle = `rgb(${mixedColor[0]}, ${mixedColor[1]}, ${mixedColor[2]})`;
+      ctx.beginPath();
+      ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Track unique color
+      const colorKey = mixedColor.join(',');
+      if (!uniqueColors.has(colorKey)) {
+        uniqueColors.add(colorKey);
+        score = uniqueColors.size;
+        scoreDisplay.textContent = String(score);
+        localStorage.setItem('rk_colorMixingScore', String(score));
+        messageBox.textContent = `🎉 New color created! You've made ${score} unique colors!`;
+      }
+    }
+
+    // ====== EVENT LISTENERS ======
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      const { x, y } = getCanvasPoint(e);
+      draw(x, y);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const { x, y } = getCanvasPoint(e);
+      draw(x, y);
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isDrawing = false;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      isDrawing = false;
+    });
+
+    // Touch events
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isDrawing = true;
+      const { x, y } = getCanvasPoint(e);
+      draw(x, y);
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const { x, y } = getCanvasPoint(e);
+      draw(x, y);
+    });
+
+    canvas.addEventListener('touchend', () => {
+      isDrawing = false;
+    });
+
+    // Clear canvas
+    clearBtn.addEventListener('click', () => {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      messageBox.textContent = 'Canvas cleared! Start painting again.';
+    });
+  </script>
+</body>
+</html>
