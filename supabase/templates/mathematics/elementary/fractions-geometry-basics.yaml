@@ -1,0 +1,153 @@
+metadata:
+  id: fractions_geometry_basics
+  title: "Fractions & Geometry Basics"
+  subject: mathematics
+  grade_range: [3RD]
+  duration_minutes: 45
+  standards:
+    - "NYS 3.NF.A.1: Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts"
+    - "NYS 3.G.A.1: Understand that shapes in different categories may share attributes"
+  version: "1.0"
+  created: "2026-03-01"
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"
+    secondary: "#2B59C3"
+    accent: "#FBC440"
+
+layout:
+  template: worksheet.hbs
+  orientation: portrait
+  page_size: letter
+
+levels:
+  "[BELOW]":
+    header:
+      title: "🍕 Fractions Are Fun! 🍕"
+      subtitle: "Learning to split things equally"
+      instructions: "Look at each shape. Color part of it to show the fraction."
+
+    sections:
+      - type: instruction_box
+        content: |
+          A **fraction** shows equal parts of a whole.
+          The bottom number tells how many equal parts in all.
+          The top number tells how many parts we are talking about.
+
+      - type: fraction_activity
+        title: "Color the Fraction"
+        items:
+          - shape: circle
+            fraction: "1/2"
+            label: "Color 1 out of 2 equal parts"
+          - shape: rectangle
+            fraction: "1/3"
+            label: "Color 1 out of 3 equal parts"
+          - shape: square
+            fraction: "1/4"
+            label: "Color 1 out of 4 equal parts"
+
+      - type: drawing_space
+        title: "Draw your own fraction! Divide a circle into 2 equal parts and color 1."
+        height: 200
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Use food to practice fractions! Cut a sandwich in half and ask your child to identify the fraction of pieces.
+
+  "[STANDARD]":
+    header:
+      title: "🍕 Fractions & Shapes 🍕"
+      subtitle: "Exploring equal parts and geometry"
+      instructions: "Complete each section to show your understanding of fractions and shapes."
+
+    sections:
+      - type: instruction_box
+        content: |
+          A **fraction** names equal parts of a whole (e.g. 1/3 means 1 part out of 3 equal parts).
+          **Numerator** = top number (parts selected)
+          **Denominator** = bottom number (total equal parts)
+
+      - type: fraction_activity
+        title: "Part A: Identify and Color Fractions"
+        items:
+          - shape: circle
+            fraction: "1/2"
+            label: "Shade 1/2"
+          - shape: rectangle
+            fraction: "2/3"
+            label: "Shade 2/3"
+          - shape: hexagon
+            fraction: "3/4"
+            label: "Shade 3/4"
+
+      - type: matching_activity
+        title: "Part B: Match the Fraction to the Picture"
+        pairs:
+          - fraction: "1/4"
+            description: "One of four equal parts colored"
+          - fraction: "1/2"
+            description: "One of two equal parts colored"
+          - fraction: "2/4"
+            description: "Two of four equal parts colored"
+
+      - type: short_answer
+        title: "Part C: Geometry Connection"
+        questions:
+          - "What makes two shapes the same category? ___________________________"
+          - "Can a square and a rectangle be in the same group? Why or why not? ___________________________"
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Ask your child to find shapes around the house and name their fraction parts. How many windows can be split in half?
+
+  "[ADVANCED]":
+    header:
+      title: "🍕 Fractions, Number Lines & Geometry 🍕"
+      subtitle: "Connecting fractions with number lines and shapes"
+      instructions: "Complete all sections. Show your thinking and explain your answers."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Fractions** show equal parts of a whole or a set.
+          On a **number line**, fractions fall between 0 and 1 based on equal spacing.
+          **Geometry** shapes can be categorized by attributes like number of sides, angles, and symmetry.
+
+      - type: number_line_activity
+        title: "Part A: Plot Fractions on a Number Line"
+        instructions: "Place each fraction correctly on the number line from 0 to 1."
+        fractions: ["1/4", "1/2", "3/4", "2/4"]
+
+      - type: fraction_comparison
+        title: "Part B: Compare Fractions"
+        instructions: "Write <, >, or = between each pair of fractions."
+        pairs:
+          - left: "1/2"
+            right: "1/4"
+          - left: "2/3"
+            right: "2/4"
+          - left: "3/4"
+            right: "1/2"
+
+      - type: investigation
+        title: "Part C: Geometry & Fractions Connection"
+        steps:
+          - "Draw a shape with 4 equal parts. Shade 3/4 of it."
+          - "Draw a different shape showing 2/4. Is 2/4 the same as 1/2? Explain."
+          - "Find two shapes that share the same category. Name one attribute they share."
+
+      - type: writing_prompt
+        question: "Explain in your own words: How is a fraction like dividing a shape into equal parts? Use an example from geometry to support your answer."
+        lines: 5
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Challenge your child to divide objects around the house into equal parts and write the fraction. Discuss equivalent fractions (e.g., 2/4 = 1/2) using visual examples.
+
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "Mathematics Series"
+  right: "NYS 3.NF.A.1 | Fractions & Geometry"

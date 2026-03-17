@@ -1,0 +1,178 @@
+metadata:
+  id: writing_process_comprehension
+  title: "Writing Process & Reading Comprehension"
+  subject: language-arts
+  grade_range: [3RD]
+  duration_minutes: 45
+  standards:
+    - "NYS 3W2: Write informative/explanatory texts to examine a topic and convey ideas and information clearly"
+    - "NYS 3RL.1: Ask and answer questions to demonstrate understanding of a text"
+  version: "1.0"
+  created: "2026-03-01"
+
+branding:
+  theme: renaissance-kids
+  colors:
+    primary: "#F05A22"
+    secondary: "#2B59C3"
+    accent: "#FBC440"
+
+layout:
+  template: worksheet.hbs
+  orientation: portrait
+  page_size: letter
+
+levels:
+  "[BELOW]":
+    header:
+      title: "✏️ Let's Write & Read! ✏️"
+      subtitle: "Learning to explain what we know"
+      instructions: "Follow the steps to write about something you know and love."
+
+    sections:
+      - type: instruction_box
+        content: |
+          Good writers share **facts** and **details** to teach readers something new.
+          Today you will practice:
+          1. Picking a topic you know
+          2. Writing sentences about it
+          3. Drawing a picture that matches
+
+      - type: writing_scaffold
+        title: "Part A: Pick Your Topic"
+        prompt: "I want to write about: ___________________________"
+        lines: 1
+
+      - type: writing_scaffold
+        title: "Part B: Write 3 Facts"
+        items:
+          - "Fact 1: ___________________________"
+          - "Fact 2: ___________________________"
+          - "Fact 3: ___________________________"
+
+      - type: drawing_space
+        title: "Draw a picture to go with your writing!"
+        height: 200
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Help your child choose a topic they know well — a pet, a hobby, a favorite place. Ask them to tell you 3 things they know, then support them in writing those facts.
+
+  "[STANDARD]":
+    header:
+      title: "✏️ Informative Writing & Comprehension ✏️"
+      subtitle: "Explaining ideas clearly with facts and details"
+      instructions: "Complete each part to practice writing and reading comprehension."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **Informative writing** teaches the reader something.
+          A strong informative paragraph has:
+          - A **topic sentence** that introduces the subject
+          - **Detail sentences** that give facts and examples
+          - A **closing sentence** that wraps up the paragraph
+
+      - type: writing_scaffold
+        title: "Part A: Plan Your Paragraph"
+        fields:
+          - label: "Topic (What are you explaining?)"
+            lines: 1
+          - label: "Detail 1 (A fact about your topic)"
+            lines: 1
+          - label: "Detail 2 (Another fact or example)"
+            lines: 1
+          - label: "Detail 3 (One more interesting detail)"
+            lines: 1
+          - label: "Closing Sentence (Wrap it up!)"
+            lines: 1
+
+      - type: writing_space
+        title: "Part B: Write Your Paragraph"
+        instructions: "Use your plan above to write a complete informative paragraph."
+        lines: 8
+
+      - type: comprehension_check
+        title: "Part C: Reading Check"
+        passage: |
+          Honeybees are amazing insects. They live together in large groups called colonies. 
+          Each bee has a special job. Worker bees collect nectar from flowers to make honey. 
+          The queen bee lays eggs to keep the colony growing. Without bees, many plants 
+          could not make seeds. Bees help flowers and crops grow by spreading pollen.
+        questions:
+          - "What do worker bees do? ___________________________"
+          - "Why are bees important to plants? ___________________________"
+          - "What is the job of the queen bee? ___________________________"
+
+      - type: parent_connection
+        content: |
+          **For Parents:** After reading the passage together, ask your child: "What is the most interesting fact you learned?" Encourage them to summarize in their own words.
+
+  "[ADVANCED]":
+    header:
+      title: "✏️ Informative Writing & Deep Comprehension ✏️"
+      subtitle: "Crafting organized, evidence-based explanatory writing"
+      instructions: "Complete all sections. Use evidence from texts and your own knowledge to support your writing."
+
+    sections:
+      - type: instruction_box
+        content: |
+          **NYS Standard 3W2** asks you to write informative/explanatory texts that:
+          - Introduce a topic clearly
+          - Group related information in paragraphs
+          - Use facts, definitions, and details
+          - Use linking words (also, another, because, for example)
+          - Provide a concluding statement
+
+      - type: writing_scaffold
+        title: "Part A: Prewriting Organizer"
+        fields:
+          - label: "Topic / Title"
+            lines: 1
+          - label: "Introduction Sentence (Hook the reader!)"
+            lines: 2
+          - label: "Paragraph 1 Main Idea + 2 Supporting Details"
+            lines: 3
+          - label: "Paragraph 2 Main Idea + 2 Supporting Details"
+            lines: 3
+          - label: "Concluding Statement"
+            lines: 2
+
+      - type: writing_space
+        title: "Part B: Draft Your Informative Writing"
+        instructions: "Write a multi-paragraph informative piece using your organizer. Use linking words to connect your ideas."
+        lines: 16
+
+      - type: comprehension_check
+        title: "Part C: Extended Reading & Response"
+        passage: |
+          Water is one of the most important resources on Earth. It covers about 71% of 
+          the planet's surface, yet only about 3% of all water is fresh water that people 
+          can drink. Fresh water is found in rivers, lakes, and underground. When it rains, 
+          water soaks into the ground or flows into rivers and streams. This water cycle 
+          keeps water moving around our planet. However, pollution and overuse threaten 
+          our water supply. Scientists and communities work together to protect clean water 
+          for future generations.
+        questions:
+          - "What percentage of Earth's water is fresh water? ___________________________"
+          - "Name two places where fresh water is found. ___________________________"
+          - "According to the passage, what threatens our water supply? ___________________________"
+          - "Why do you think protecting clean water is important? Use evidence from the text and your own ideas."
+
+      - type: revision_checklist
+        title: "Part D: Writer's Checklist"
+        items:
+          - "[ ] My writing has a clear topic sentence."
+          - "[ ] I used at least 3 facts or details."
+          - "[ ] I used linking words (also, because, for example)."
+          - "[ ] My concluding sentence wraps up the topic."
+          - "[ ] I checked for spelling and punctuation."
+
+      - type: parent_connection
+        content: |
+          **For Parents:** Review the writer's checklist together. Ask your child to read their writing aloud — this helps them catch errors and improve sentence flow. Celebrate the details they included!
+
+footer:
+  left: "© 2026 Renaissance Kids"
+  center: "Language Arts Series"
+  right: "NYS 3W2 | Writing & Comprehension"
