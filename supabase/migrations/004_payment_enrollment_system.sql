@@ -17,8 +17,9 @@ create table if not exists public.classes (
 -- PAYMENT INTENTS
 create table if not exists public.payment_intents (
   id uuid default gen_random_uuid() primary key,
-  stripe_session_id text unique,
-  stripe_payment_intent_id text unique,
+  square_checkout_id text unique,
+  square_payment_id text unique,
+  square_order_id text unique,
   parent_id uuid references profiles(id) on delete cascade,
   student_id uuid references students(id) on delete cascade,
   class_id uuid references classes(id) on delete cascade,
@@ -78,6 +79,7 @@ using (public.has_role('admin'));
 -- INDEXES
 create index if not exists idx_classes_instructor on classes(instructor_id);
 create index if not exists idx_classes_status on classes(status);
-create index if not exists idx_payment_intents_stripe_session on payment_intents(stripe_session_id);
+create index if not exists idx_payment_intents_square_checkout on payment_intents(square_checkout_id);
+create index if not exists idx_payment_intents_square_payment on payment_intents(square_payment_id);
 create index if not exists idx_enrollments_student on enrollments(student_id);
 create index if not exists idx_enrollments_instructor on enrollments(instructor_id);
