@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { generateQuarterlyReportPdf } from "@/lib/services/reportService";
+import { buildQuarterlyProgressReport } from "@/lib/services/quarterlyReportBuilder";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,95 +22,42 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const yearNumber = parseInt(year, 10);
   const quarterNumber = parseInt(quarter, 10);
-  if (isNaN(quarterNumber) || quarterNumber < 1 || quarterNumber > 4) {
+
+  if (
+    Number.isNaN(yearNumber) ||
+    Number.isNaN(quarterNumber) ||
+    quarterNumber < 1 ||
+    quarterNumber > 4
+  ) {
     return NextResponse.json(
-      { error: "quarter must be a number between 1 and 4" },
+      { error: "year and quarter are required, and quarter must be 1-4" },
       { status: 400 }
     );
   }
 
-  const yearNumber = parseInt(year, 10);
-  const quarterStartMonth = (quarterNumber - 1) * 3 + 1;
-  const quarterEndMonth = quarterStartMonth + 2;
-  const startDate = new Date(yearNumber, quarterStartMonth - 1, 1)
-    .toISOString()
-    .split("T")[0];
-  const endDate = new Date(yearNumber, quarterEndMonth, 0)
-    .toISOString()
-    .split("T")[0];
-
-  const [skillsResult, assessmentsResult, worksheetsResult] = await Promise.all(
-    [
-      supabase
-        .from("student_skills")
-        .select("*")
-        .eq("student_id", studentId)
-        .order("subject"),
-      supabase
-        .from("educator_assessments")
-        .select("*")
-        .eq("student_id", studentId)
-        .gte("assessed_at", startDate)
-        .lte("assessed_at", endDate)
-        .order("assessed_at"),
-      supabase
-        .from("worksheet_logs")
-        .select("*")
-        .eq("student_id", studentId)
-        .gte("generated_at", startDate)
-        .lte("generated_at", endDate)
-        .order("generated_at"),
-    ]
-  );
-
-  if (skillsResult.error || assessmentsResult.error || worksheetsResult.error) {
-    const err =
-      skillsResult.error?.message ??
-      assessmentsResult.error?.message ??
-      worksheetsResult.error?.message;
-    return NextResponse.json({ error: err }, { status: 500 });
-  }
-
-  const report = {
-    student_id: studentId,
+  const payload = await buildQuarterlyProgressReport({
+    supabase,
+    studentId,
     year: yearNumber,
     quarter: quarterNumber,
-    period: { start: startDate, end: endDate },
-    skills: skillsResult.data,
-    assessments: assessmentsResult.data,
-    worksheets: worksheetsResult.data,
-    summary: {
-      total_skills_tracked: skillsResult.data?.length ?? 0,
-      total_assessments: assessmentsResult.data?.length ?? 0,
-      total_worksheets_completed:
-        worksheetsResult.data?.filter(
-          (w) => w.status === "completed" || w.status === "reviewed"
-        ).length ?? 0,
-      average_assessment_score:
-        assessmentsResult.data && assessmentsResult.data.length > 0
-          ? Math.round(
-              assessmentsResult.data.reduce(
-                (sum, a) => sum + (a.score_percentage ?? 0),
-                0
-              ) / assessmentsResult.data.length
-            )
-          : null,
-    },
-    ihip_compliant: true,
-    generated_at: new Date().toISOString(),
-  };
+  });
+
+  if ("error" in payload) {
+    return NextResponse.json({ error: payload.error }, { status: payload.status ?? 500 });
+  }
 
   if (format === "pdf") {
-    const pdfBytes = await generateQuarterlyReportPdf(report);
+    const pdfBytes = await generateQuarterlyReportPdf(payload.report);
     return new NextResponse(pdfBytes, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="ihip-report-q${quarter}-${year}-${studentId}.pdf"`,
+        "Content-Disposition": `attachment; filename="quarterly-progress-q${quarter}-${year}-${studentId}.pdf"`,
       },
     });
   }
 
-  return NextResponse.json({ report }, { status: 200 });
+  return NextResponse.json({ report: payload.report }, { status: 200 });
 }
