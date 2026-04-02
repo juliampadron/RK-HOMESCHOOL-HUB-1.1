@@ -475,3 +475,6 @@ D) QUICK CHECKS (so it works first try)
    update og:url and (optional) canonical link.
 
 If you tell me your actual folder/routing (Next.js route vs static public files), I’ll output the *exact* file paths + a patch-style diff tailored to your repo.
+## Brand
+
+- See `docs/renaissance-kids-brand-style-guide.md` for the Renaissance Kids brand standards used in UI updates.
