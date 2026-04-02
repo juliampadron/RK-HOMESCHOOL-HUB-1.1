@@ -25,6 +25,8 @@
     .score-board{display:flex;align-items:center;gap:10px;font-weight:800;background:rgba(255,255,255,.12);padding:10px 14px;border-radius:999px;border:2px solid rgba(255,255,255,.20);}
     .score-pill{background:var(--rk-yellow);color:#1c1c1c;padding:6px 12px;border-radius:999px;border:2px solid rgba(0,0,0,.25);min-width:44px;text-align:center;}
     main{padding:18px 18px 22px;}
+    .hero{margin-bottom:16px;}
+    .hero img{width:100%;height:auto;display:block;border-radius:18px;border:2px solid rgba(47,107,101,.2);box-shadow:0 10px 18px rgba(0,0,0,.08);}
     .message{background:#fff7e6;border:2px solid rgba(251,196,64,.55);border-radius:18px;padding:14px 14px;font-weight:650;margin-bottom:14px;}
     .play-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;}
     .btn{border:2px solid rgba(0,0,0,.25);border-radius:999px;padding:12px 16px;font-weight:800;cursor:pointer;background:#fff;}
@@ -55,6 +57,9 @@
       </div>
     </header>
     <main>
+      <div class="hero" aria-label="Solfege Staircase hero image">
+        <img src="./solfege-staircase-hero.svg" alt="Colorful staircase blocks with floating music notes for the Solfège Staircase game.">
+      </div>
       <div id="messageBox" class="message">Press <b>PLAY NOTE</b>, then click the matching step.</div>
       <div class="play-row">
         <button id="playBtn" class="btn btn-primary">▶ PLAY NOTE</button>
