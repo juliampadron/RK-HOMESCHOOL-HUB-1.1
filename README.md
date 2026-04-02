@@ -1,5 +1,13 @@
 # RK-HOMESCHOOL-HUB-1.1
 Web App
+
+## Operational Notes (April 2, 2026)
+
+- Added Checkr webhook route scaffold: `POST /api/webhooks/checkr`.
+- Added migration for Checkr fields on `instructor_profiles`.
+- Added deployment and environment setup guides under `docs/`.
+- Added explicit public-game status tracking in `Solfege_Color_Mixing_Games.txt`.
+
 public/homeschool-hub/solfege-staircase/index.html -----
 
 <!DOCTYPE html>
