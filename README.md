@@ -1,477 +1,188 @@
-# RK-HOMESCHOOL-HUB-1.1
-Web App
-public/homeschool-hub/solfege-staircase/index.html -----
+# Renaissance Kids Homeschool Hub
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+Comprehensive Program Operations Guide & Technical Handoff (v2.0)
 
-  <title>🎵 Solfege Staircase · Renaissance Kids</title>
+- **Document type:** Program Operations Manual + Technical Specification
+- **Audience:** Program Directors, Educators, Technical Team, AI Assistants
+- **Version:** 2.0
+- **Date:** February 26, 2026
+- **Owner:** Renaissance Kids Leadership Team
 
-  <!-- SEO -->
-  <meta name="title" content="🎵 Solfege Staircase · Renaissance Kids">
-  <meta name="description" content="Climb the musical stairs! A fun, interactive ear-training game that helps children recognize and sing the notes of the major scale. Free from Renaissance Kids.">
+## Executive Summary
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.renkids.org/homeschool-hub/solfege-staircase">
-  <meta property="og:title" content="🎵 Solfege Staircase · Renaissance Kids">
-  <meta property="og:description" content="Climb the musical stairs! A fun, interactive ear-training game that helps children recognize and sing the notes of the major scale. Free from Renaissance Kids.">
-  <meta property="og:image" content="https://www.renkids.org/images/rk-solfege-share.png">
+Renaissance Kids Homeschool Hub integrates two age-specific tracks with NYS standards-aligned academics and arts integration:
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="🎵 Solfege Staircase · Renaissance Kids">
-  <meta name="twitter:description" content="Climb the musical stairs! A fun, interactive ear-training game for young musicians.">
-  <meta name="twitter:image" content="https://www.renkids.org/images/rk-solfege-share.png">
+- **Elementary Program (Ages 5–9):** Foundation and discovery through play.
+- **Middle/Upper Program (Ages 10–16):** Mastery, analytical thinking, and project-based rigor.
 
-  <style>
-    :root{
-      --rk-green:#2F6B65;
-      --rk-yellow:#FBC440;
-      --rk-orange:#F05A22;
-      --bg:#fdfbf7;
-      --panel:#ffffff;
-      --ink:#1c1c1c;
-    }
+The platform combines:
 
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      display:flex;
-      justify-content:center;
-      padding:18px;
-    }
+- Worksheet generation (Writing Room)
+- Interactive science simulations (Science Safari)
+- Student progress dashboards
+- Quarterly reporting and portfolio support
 
-    .game-container{
-      width:min(860px, 100%);
-      background: var(--panel);
-      border-radius: 28px;
-      border: 3px solid rgba(47,107,101,.18);
-      box-shadow: 0 18px 40px rgba(47,107,101,.18);
-      overflow:hidden;
-    }
+> Core philosophy: **“Learning is lit up through the arts.”**
 
-    header{
-      background: var(--rk-green);
-      color:#fff;
-      padding:18px 20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      border-bottom: 6px solid var(--rk-yellow);
-      gap:14px;
-    }
+---
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:800;
-      letter-spacing:.2px;
-    }
+## 1) Program Architecture Overview
 
-    .brand .badge{
-      width:44px;height:44px;border-radius:14px;
-      background:#fff;
-      display:grid;place-items:center;
-      color: var(--rk-orange);
-      font-size:20px;
-      box-shadow:0 6px 14px rgba(0,0,0,.12);
-    }
+### 1.1 Age-Based Structure
 
-    .score-board{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      background: rgba(255,255,255,.12);
-      padding:10px 14px;
-      border-radius:999px;
-      border:2px solid rgba(255,255,255,.20);
-    }
+| Program | Goal | Class Format | Instructional Approach | Assessment |
+|---|---|---|---|---|
+| Ages 5–9 | Foundation + discovery through play | 90-minute integrated blocks | Games, hands-on exploration, arts integration | Observation checklists + portfolios |
+| Ages 10–16 | Mastery + analytical thinking | 2-hour immersion blocks | Formal method, lab reports, digital media production | Rubrics, reports, quarterly tracking |
 
-    .score-pill{
-      background: var(--rk-yellow);
-      color:#1c1c1c;
-      padding:6px 12px;
-      border-radius:999px;
-      border:2px solid rgba(0,0,0,.25);
-      min-width:44px;
-      text-align:center;
-    }
+### 1.2 NYS Standards Alignment
 
-    main{ padding:18px 18px 22px; }
+- **ELA:** Foundational literacy (K–3) to literary analysis and research (4–8)
+- **Math:** Counting/place value (K–3) to algebra readiness/functions (4–8)
+- **Science:** Foundational exploration (K–3) to formal scientific method + lab reporting (4–8)
+- **Arts Integration:** Movement, music, and visual art through digital media and performance
 
-    .message{
-      background:#fff7e6;
-      border:2px solid rgba(251,196,64,.55);
-      border-radius:18px;
-      padding:14px 14px;
-      font-weight:650;
-      margin-bottom:14px;
-    }
+---
 
-    .play-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      margin-bottom:16px;
-    }
+## 2) Elementary Program (Ages 5–9)
 
-    .btn{
-      border:2px solid rgba(0,0,0,.25);
-      border-radius:999px;
-      padding:12px 16px;
-      font-weight:800;
-      cursor:pointer;
-      background:#fff;
-    }
-    .btn-primary{
-      background: var(--rk-orange);
-      color:#fff;
-      border-color: rgba(0,0,0,.25);
-    }
-    .btn-secondary{
-      background: var(--rk-yellow);
-      color:#1c1c1c;
-    }
+### 2.1 90-Minute Block
 
-    .staircase{
-      display:grid;
-      gap:10px;
-    }
+- **0:00–0:30** Literacy circle (phonics, read-aloud, comprehension)
+- **0:30–0:45** Rotating stations (handwriting, spelling, independent reading)
+- **0:45–1:15** Math explorations (manipulatives and fact fluency)
+- **1:15–1:30** Closing circle (share-out + preview)
 
-    .step{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 14px;
-      border-radius:18px;
-      border:2px solid rgba(47,107,101,.18);
-      background:#fff;
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-      user-select:none;
-    }
+### 2.2 Science Quarterly Themes
 
-    .step[aria-disabled="true"]{
-      opacity:.55;
-      pointer-events:none;
-    }
+- **Fall:** Life science
+- **Winter:** Physical science
+- **Spring:** Earth science
+- **Summer:** Aerospace/space
 
-    .solfege{
-      font-weight:900;
-      background: rgba(47,107,101,.12);
-      color: var(--rk-green);
-      padding:8px 12px;
-      border-radius:999px;
-      border:2px solid rgba(47,107,101,.18);
-      min-width:90px;
-      text-align:center;
-      letter-spacing:.6px;
-    }
+Sample lab: **Push and Pull** (`K-PS2-1`, `K-PS2-2`) with predict → test → record → discuss workflow.
 
-    .note-letter{
-      font-weight:900;
-      background: rgba(251,196,64,.25);
-      padding:8px 12px;
-      border-radius:999px;
-      border:2px solid rgba(0,0,0,.14);
-      min-width:60px;
-      text-align:center;
-    }
+---
 
-    .footer-note{
-      padding:12px 18px 18px;
-      color: rgba(0,0,0,.55);
-      font-weight:650;
-      text-align:center;
-    }
+## 3) Middle & Upper Program (Ages 10–16)
 
-    /* PRINT MODE: worksheet conversion */
-    @media print {
-      body {
-        background: white !important;
-        color: black !important;
-        padding: 0 !important;
-      }
-      .game-container {
-        background: white !important;
-        border: 2px solid #2F6B65 !important;
-        box-shadow: none !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        border-radius: 0 !important;
-      }
-      .btn,
-      .score-board,
-      .play-row,
-      .footer-note {
-        display: none !important;
-      }
-      main{ padding: 18px !important; }
-      .staircase { margin-top: 18px; gap: 6px !important; }
-      .step {
-        background: white !important;
-        color: black !important;
-        border: 1px solid #ccc !important;
-        border-left: 10px solid #2F6B65 !important;
-        box-shadow: none !important;
-        page-break-inside: avoid;
-      }
-      .solfege {
-        background: #eee !important;
-        color: black !important;
-        border: 1px solid black !important;
-      }
-      .note-letter {
-        background: white !important;
-        border: 1px dotted #666 !important;
-      }
-      .message {
-        border: 1px solid #2F6B65 !important;
-        background: white !important;
-        margin-top: 18px !important;
-        min-height: 90px;
-        text-align: left !important;
-      }
-      .message::before {
-        content: "Teacher/Parent Notes:";
-        font-weight: bold;
-        display: block;
-        margin-bottom: 10px;
-      }
-      header::before {
-        content: "Student Name: __________________________  Date: ____________";
-        display: block;
-        margin-bottom: 10px;
-        font-weight: bold;
-      }
-    }
-  </style>
-</head>
+### 3.1 2-Hour Block
 
-<body>
-  <div class="game-container">
-    <header>
-      <div class="brand">
-        <div class="badge" aria-hidden="true">🎵</div>
-        <div>
-          <div style="font-size:1.05rem;">Renaissance Kids</div>
-          <div style="opacity:.9;font-weight:700;font-size:.92rem;">Solfege Staircase</div>
-        </div>
-      </div>
+- **0:00–0:45** Language arts intensive
+- **0:45–1:30** Mathematics workshop
+- **1:30–2:00** Cross-curricular application
 
-      <div class="score-board" aria-label="Score">
-        ⭐ Stars
-        <span id="scoreDisplay" class="score-pill">0</span>
-      </div>
-    </header>
+### 3.2 Scientific Method + Formal Lab Reports
 
-    <main>
-      <div id="messageBox" class="message">Press <b>PLAY NOTE</b>, then click the matching step.</div>
+Student workflow:
+1. Observation
+2. Research
+3. Hypothesis
+4. Experiment
+5. Data analysis
+6. Conclusion
 
-      <div class="play-row">
-        <button id="playBtn" class="btn btn-primary">▶ PLAY NOTE</button>
-        <button id="resetBtn" class="btn btn-secondary">↺ Reset Stars</button>
-        <button class="btn" onclick="window.print()">🖨 Print Worksheet</button>
-      </div>
+Lab reports use a consistent structure: Introduction, Methods, Results, Discussion, References.
 
-      <div id="staircase" class="staircase" aria-label="Solfege staircase"></div>
-    </main>
+---
 
-    <div class="footer-note">
-      “Light up learning through the arts.” · renkids.org · (845) 452-4225
-    </div>
-  </div>
+## 4) Cross-Program Compliance & Operations
 
-  <script>
-    // ====== SOLFEGE DATA ======
-    const steps = [
-      { solfege: "DO",  letter: "C",  freq: 261.63 },
-      { solfege: "RE",  letter: "D",  freq: 293.66 },
-      { solfege: "MI",  letter: "E",  freq: 329.63 },
-      { solfege: "FA",  letter: "F",  freq: 349.23 },
-      { solfege: "SOL", letter: "G",  freq: 392.00 },
-      { solfege: "LA",  letter: "A",  freq: 440.00 },
-      { solfege: "TI",  letter: "B",  freq: 493.88 },
-      { solfege: "DO",  letter: "C",  freq: 523.25 }
-    ];
+### 4.1 Tagging System
 
-    // ====== GAME STATE (LOCALSTORAGE ENABLED) ======
-    let currentNoteIndex = null;
-    let stepsEnabled = false;
+Student skill profiles use tags (e.g., `[3RD-ADVANCED]`, `[2ND-STANDARD]`) per subject and drive:
 
-    // saved score (defaults to 0)
-    let score = parseInt(localStorage.getItem('rk_solfegeScore'), 10);
-    if (Number.isNaN(score)) score = 0;
+- Worksheet leveling
+- Grouping decisions
+- Progress reporting
 
-    // DOM
-    const staircase = document.getElementById("staircase");
-    const messageBox = document.getElementById("messageBox");
-    const scoreDisplay = document.getElementById("scoreDisplay");
-    const playBtn = document.getElementById("playBtn");
-    const resetBtn = document.getElementById("resetBtn");
+### 4.2 IHIP and Quarterly Documentation
 
-    // ====== AUDIO ======
-    let audioCtx = null;
-    function ensureAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === "suspended") audioCtx.resume();
-    }
-    function playTone(freq, duration = 0.7) {
-      ensureAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
+Each quarter includes:
+- Instructional hours by subject
+- Standards addressed
+- Work samples + assessments
+- Next-quarter goals
 
-      // gentle envelope
-      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+### 4.3 Daily Staff Operations
 
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+**Before class:** review tags, prep worksheets/materials, stage simulations.
 
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    }
+**During class:** attendance, instructional logging, subgroup support, observation capture.
 
-    // ====== UI BUILD ======
-    function renderStaircase() {
-      staircase.innerHTML = "";
-      steps.forEach((s, idx) => {
-        const step = document.createElement("div");
-        step.className = "step";
-        step.setAttribute("role", "button");
-        step.setAttribute("tabindex", "0");
-        step.setAttribute("aria-label", `Step ${idx + 1}: ${s.solfege} (${s.letter})`);
-        step.dataset.index = idx;
+**After class:** progress updates, portfolio filing, inventory checks, next-week generation.
 
-        const left = document.createElement("div");
-        left.className = "solfege";
-        left.textContent = s.solfege;
+---
 
-        const right = document.createElement("div");
-        right.className = "note-letter";
-        right.textContent = s.letter;
+## 5) Technical Platform
 
-        step.appendChild(left);
-        step.appendChild(right);
+### 5.1 Writing Room (Worksheet Generation)
 
-        step.addEventListener("click", () => handleStepClick(idx));
-        step.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleStepClick(idx);
-          }
-        });
+Template-driven worksheet generation is powered by YAML templates under `supabase/templates`.
 
-        staircase.appendChild(step);
-      });
+Example pathways in this repository:
 
-      disableSteps(true);
-    }
+- `supabase/templates/science/elementary/forces/push-pull-basics.yaml`
+- `supabase/templates/elementary_science/forces_ramps_motion.yml`
+- `supabase/templates/mathematics/elementary/fractions-geometry-basics.yaml`
 
-    function disableSteps(disabled) {
-      const children = staircase.querySelectorAll(".step");
-      children.forEach(el => {
-        el.setAttribute("aria-disabled", disabled ? "true" : "false");
-      });
-    }
+### 5.2 Science Safari (Interactive Simulations)
 
-    // ====== GAME FLOW ======
-    function chooseNewNote() {
-      currentNoteIndex = Math.floor(Math.random() * steps.length);
-      stepsEnabled = true;
-      disableSteps(false);
-      playTone(steps[currentNoteIndex].freq);
-      messageBox.innerHTML = "Listen carefully… then click the matching step!";
-    }
+Supports interactive concept exploration before and during hands-on labs:
 
-    function handleStepClick(clickedIndex) {
-      if (!stepsEnabled || currentNoteIndex === null) return;
+- Forces and friction
+- Static electricity
+- Light waves
+- Gravity challenge modes
 
-      if (clickedIndex === currentNoteIndex) {
-        // correct
-        score++;
-        scoreDisplay.innerText = String(score);
-        localStorage.setItem('rk_solfegeScore', String(score)); // Save progress
-        messageBox.innerText = `✅ CORRECT! That was ${steps[currentNoteIndex].solfege} (${steps[currentNoteIndex].letter}). Great ear!`;
-        disableSteps(true);
-        stepsEnabled = false;
-        currentNoteIndex = null;
-      } else {
-        // wrong: give hint without shaming
-        messageBox.innerText = `Try again — listen once more, then choose the step that matches.`;
-        playTone(steps[currentNoteIndex].freq, 0.6);
-      }
-    }
+### 5.3 Solfege Staircase (“Sôul fetched staircase” pathway)
 
-    function resetScore() {
-      score = 0;
-      scoreDisplay.innerText = '0';
-      localStorage.setItem('rk_solfegeScore', '0'); // Reset saved progress
-      messageBox.innerText = "✨ Score reset. Let’s start a new climb!";
-      disableSteps(true);
-      stepsEnabled = false;
-      currentNoteIndex = null;
-    }
+The interactive Solfege Staircase experience is maintained at:
 
-    // ====== INIT ======
-    document.addEventListener("DOMContentLoaded", () => {
-      scoreDisplay.innerText = String(score);
-      if (score > 0) {
-        messageBox.innerText = `👋 Welcome back! You have ${score} stars. Press “PLAY NOTE” to keep climbing!`;
-      }
-    });
+- `homeschool-hub/solfege-staircase/index.html`
 
-    playBtn.addEventListener("click", chooseNewNote);
-    resetBtn.addEventListener("click", resetScore);
+This README now references the staircase file directly instead of embedding large raw HTML.
 
-    renderStaircase();
-  </script>
-</body>
-</html>
+---
 
------ END FILE -----
+## 6) Red Code Pathway (New)
 
-────────────────────────────────────────────────────────────
-C) GIT COMMANDS TO “UPLOAD NEW CODE” (copy/paste)
-────────────────────────────────────────────────────────────
-# from your repo root:
-git checkout main
-git pull
+The requested **Red code** implementation has been moved into a dedicated technical handoff file:
 
-# add the hero/share image
-mkdir -p public/images
-# move/copy your hero image into this exact path/name:
-# public/images/rk-solfege-share.png
+- `docs/technical/red-code-pathway.md`
 
-# add the solfege page
-mkdir -p public/homeschool-hub/solfege-staircase
-# save the HTML above as:
-# public/homeschool-hub/solfege-staircase/index.html
+This new file contains:
+- YAML worksheet template scaffolds
+- SQL report query scaffold
+- TypeScript simulation component scaffold
+- Prompt templates for AI-assisted content generation
 
-git add public/images/rk-solfege-share.png public/homeschool-hub/solfege-staircase/index.html
-git commit -m "Add Solfege Staircase: OG tags, localStorage progress, print worksheet mode"
-git push origin main
+---
 
-────────────────────────────────────────────────────────────
-D) QUICK CHECKS (so it works first try)
-────────────────────────────────────────────────────────────
-1) Open the page locally → earn stars → refresh → stars should persist.
-2) Cmd/Ctrl+P → worksheet layout should hide buttons and print the staircase cleanly.
-3) Confirm the OG image path is live:
-   https://www.renkids.org/images/rk-solfege-share.png
-4) If your live path is NOT /homeschool-hub/solfege-staircase,
-   update og:url and (optional) canonical link.
+## 7) Implementation Roadmap (High Level)
 
-If you tell me your actual folder/routing (Next.js route vs static public files), I’ll output the *exact* file paths + a patch-style diff tailored to your repo.
+### Phase 1 (Months 1–2)
+- Scheduling finalized
+- Staff trained on tagging
+- Student profiles initialized
+- Core templates migrated
+
+### Phase 2 (Months 3–4)
+- Science Safari classroom integration
+- Quarterly reports launched
+- Family portfolio onboarding
+- Claymation pilot launched
+
+### Phase 3 (Months 5–6)
+- Data-informed tag validation
+- Template prompt optimization
+- Family science night
+- Summer intensives publication
+
+---
+
+## Repository Notes
+
+- This repository is the working implementation surface for program operations and technical delivery.
+- Use this README as the operational index.
+- Use `docs/technical/red-code-pathway.md` for implementation scaffolds and AI handoff prompts.
