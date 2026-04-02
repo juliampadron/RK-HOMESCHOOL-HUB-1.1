@@ -1,272 +1,297 @@
-# Homeschool Hub Immediate Deep-Dive Plan
+# Homeschool Hub Immediate Deep-Dive Plan (Architecture-Aligned)
 
-## Scope and Design Principles
-
-This plan translates your three immediate priorities into implementation-ready workflows. It is designed to preserve Renaissance Kids' quality bar while keeping onboarding low-friction for excellent instructors.
-
-**Operating principles**
-- **Safety by default:** No instructor can be visible/bookable without passing required trust checks.
-- **Progressive onboarding:** Collect only what is needed at each step; defer non-blocking fields.
-- **Parent transparency:** Families should always see verification status, safety readiness, and reporting artifacts.
-- **State-aware compliance:** Compliance tasks are dynamically shown by state and program type.
+This revision maps the three priority areas directly to the current platform architecture:
+- **Frontend:** Next.js 14 + TypeScript + Tailwind + shadcn/ui
+- **Backend:** Supabase + Stripe + Checkr + Vercel
+- **Core data model:** `profiles`, `user_roles`, `students`, `instructor_profiles`, `classes`, `games`, `enrollments`, `payment_intents`
+- **Security model:** RLS-first, service-role webhooks, append-only audit trails
 
 ---
 
-## Priority 1: Trust, Safety, and Regulatory Compliance
+## 1) Priority: Trust, Safety, and Regulatory Compliance
 
-### 1) Background Check Workflows (Checkr-style + state-aware rules)
+## 1.1 Background Checks (Checkr) Without High Friction
 
-#### Recommended onboarding flow
-1. Instructor account created (email + phone OTP + legal name).
-2. Instructor completes consent disclosure and SSN/ID handoff in embedded check flow.
-3. Platform sends screening package request based on service state(s):
-   - Base package: SSN trace + sex offender registry + national criminal database.
-   - Add-ons by state/county risk policy (county criminal, federal criminal, motor vehicle if transportation offered).
-4. Instructor status becomes **"Pending Review"** (cannot receive bookings).
-5. Webhook updates status in real time:
-   - `clear` → eligible for activation if other trust items complete.
-   - `consider` / `suspended` → internal trust queue for manual adjudication.
-6. Recheck cadence:
-   - Annual full recheck.
-   - Continuous monitoring (if provider supports) for new offenses.
+### Product flow (instructor onboarding)
+1. Instructor completes account setup (`profiles` + `user_roles=instructor`).
+2. Instructor profile is created in `instructor_profiles` with:
+   - `background_check_status = 'not_started'`
+   - `is_marketplace_approved = false`
+3. Instructor starts Checkr consent flow from onboarding stepper.
+4. Checkr webhook (`POST /api/webhooks/checkr`) updates status:
+   - `pending` → `in_progress`
+   - `clear` → `cleared`
+   - `consider` / `suspended` → `manual_review`
+5. Only when trust gates pass does admin set `is_marketplace_approved = true`.
 
-#### Product requirements
-- **State rules engine**: Store package IDs and legal copy per state.
-- **Adjudication playbook**: Internal matrix for what is disqualifying, conditionally reviewable, or acceptable.
-- **Turnaround UX**: Show expected timeline and checklist progress bar to reduce drop-off.
-- **Cost control**:
-  - Default to base package for all.
-  - Trigger incremental add-ons only when required by locale/program.
-  - Use staged payment: platform fronts first check for "First 10," then cost-share model for broader marketplace.
+### Data additions (Supabase)
+Add these columns to `instructor_profiles`:
+- `background_check_status text not null default 'not_started'`
+- `background_check_completed_at timestamptz`
+- `background_check_provider text default 'checkr'`
+- `background_check_report_id text`
+- `background_recheck_due_at timestamptz`
 
-#### Compliance controls
-- Track consent timestamp, IP, disclosure version, and report ID.
-- Keep adverse action workflow templates ready (pre-adverse notice, dispute window, final notice).
-- Separate PII vault from general profile data.
+Add table:
+- `background_check_events` (append-only)
+  - `id uuid pk`
+  - `instructor_profile_id`
+  - `provider_event_id`
+  - `old_status`, `new_status`
+  - `payload jsonb`
+  - `created_at`
 
----
+### Cost + UX controls
+- Use a **two-stage package policy**:
+  - Stage A (default): lower-cost baseline checks.
+  - Stage B (conditional): state/county add-ons only when required.
+- For “First 10” instructors: platform-subsidized checks.
+- For general marketplace: pass-through or partial subsidy.
 
-### 2) Insurance Verification + Micro-policy Option
-
-#### Verification portal requirements
-- Instructor uploads COI (certificate of insurance) with:
-  - Policy holder legal name matching account legal entity.
-  - General liability limit threshold (e.g., $1M occurrence / $2M aggregate baseline).
-  - Abuse/molestation endorsement for child-facing programs.
-  - Effective/expiration dates with automated renewal reminders (30/14/3 days).
-- Admin review queue with:
-  - OCR extraction for key fields.
-  - Mismatch flags (expired, name mismatch, insufficient limits, missing abuse coverage).
-
-#### Partnership model for "Hub Instructor" micro-policies
-- Build a referral or embedded quote flow with a child-service-friendly broker/carrier.
-- Offer pre-filled application data from instructor profile to reduce form fatigue.
-- Target monthly/annual micro-policy products scoped for independent educators.
-- Add "insurance eligible" tag and quote CTA for instructors who fail verification.
-
-#### Trust badge outcomes (parent-facing)
-- "Insurance Verified" with expiration date.
-- "Coverage Pending" when expiring soon or under review.
-- "Not Insured via Hub Standard" hidden from marketplace search unless family explicitly opts in (not recommended for launch).
+### RLS and security
+- Parents can only read a derived public trust badge, never raw check details.
+- Only admin/service role can read provider payloads.
+- Webhook route verifies Checkr signature and writes audit logs.
 
 ---
 
-### 3) Safety Protocols for In-person Pods
+## 1.2 Insurance Verification + Hub Micro-Policy
 
-#### Digital waiver stack
-- Parent signs:
-  - Liability waiver.
-  - Photo/media release.
-  - Medical treatment authorization.
-  - Behavior and pickup policy acknowledgement.
-- Version all documents and bind signature to version hash + timestamp.
+### Required fields on instructor profile
+- `insurance_status text not null default 'not_submitted'`
+- `insurance_carrier text`
+- `policy_number_last4 text`
+- `policy_effective_date date`
+- `policy_expiration_date date`
+- `gl_coverage_per_occurrence numeric`
+- `gl_coverage_aggregate numeric`
+- `abuse_coverage_verified boolean default false`
 
-#### Emergency contact and health capture
-- Required fields:
-  - Primary/secondary emergency contacts.
-  - Allergy/medical alerts.
-  - Authorized pickup list with relationship + optional photo.
-- Display a "quick safety card" view for instructors on mobile check-in.
+### Supporting tables
+- `insurance_documents`
+  - file path in Supabase Storage
+  - review status (`pending`, `approved`, `rejected`)
+  - reviewer + timestamp
+- `insurance_verification_events` (append-only)
 
-#### Pick-up / drop-off digital sign-out
-- Check-in:
-  - Parent/guardian QR or PIN + geo/time stamp.
-- Check-out:
-  - Verify authorized pickup name (and optional photo match).
-  - Capture signature and reason if non-standard pickup.
-- Escalation:
-  - One-tap "guardian not authorized" protocol with audit trail and alert to admin.
+### Workflow
+1. Instructor uploads COI in onboarding.
+2. Admin review queue validates limits + abuse coverage.
+3. Approved insurance updates `insurance_status='verified'`.
+4. Renewal automation triggers notifications at 30/14/3 days pre-expiry.
+5. Expired policies auto-downgrade instructor visibility in search.
 
-#### Incident readiness
-- In-app incident report form with severity level + witness notes + photo upload.
-- Auto-notify admin and retain immutable timeline.
-- Post-incident follow-up tasks and closure status.
-
----
-
-## Priority 2: Instructor Onboarding & Vetting
-
-### 1) Profile Verification Framework
-
-#### Vetting stages (gated)
-1. **Identity & Contact**: legal name, address, phone verification.
-2. **Background Cleared**: completed screening status.
-3. **Credentials Verification**:
-   - Degree/certification uploads.
-   - Manual verification for first cohort; automate later.
-4. **Experience Review**:
-   - Resume + portfolio + teaching sample (video or lesson artifact).
-   - Reference checks (minimum 2, at least 1 parent/family reference if available).
-5. **Philosophy Fit**:
-   - Short structured questionnaire on arts-integrated pedagogy.
-   - Rubric scored by academic lead.
-6. **Safety Readiness**:
-   - Insurance verified.
-   - Waiver/check-in protocol training complete.
-
-#### Rubric dimensions (score 1-5)
-- Pedagogical skill.
-- Classroom management/safety mindset.
-- Subject competence (math/science/language integration).
-- Communication professionalism.
-- Family alignment and warmth.
-
-Require minimum composite threshold for listing activation.
+### Micro-policy partnership path
+- Add “Get insured” CTA in onboarding when status is rejected/missing.
+- Pre-fill partner form fields from profile to lower drop-off.
+- Track quote starts and bind conversions in `insurance_partner_referrals`.
 
 ---
 
-### 2) Initial Micro-credentialing System (first 5 badges)
+## 1.3 Pod Safety Protocols (Waivers, Emergency Contacts, Pickup)
 
-Launch with clear, high-signal badges:
-1. **Background Cleared**
-   - Issued when current background check is cleared and in-date.
-2. **Verified Arts-Integrated Educator**
-   - Issued after lesson-plan review demonstrates arts + academics integration.
-3. **STEM Teaching Verified**
-   - Issued when instructor demonstrates grade-appropriate STEM instruction competency.
-4. **Special Needs Accessible (Level 1)**
-   - Issued for completion of accessibility/accommodation training + sample adaptation artifact.
-5. **Safety Protocol Certified**
-   - Issued when instructor completes pod safety workflow simulation (waiver, incident, pickup protocol).
+### Parent/student data model
+- `students`
+  - `medical_notes text`
+  - `allergies text`
+- `student_emergency_contacts`
+- `student_pickup_authorizations`
 
-Badge governance:
-- Badge criteria published publicly.
-- Expiration/revalidation rules (12-24 months depending on badge).
-- Evidence artifacts retained for audit.
+### Operational tables
+- `waiver_templates` (versioned)
+- `waiver_signatures`
+- `attendance_events` (`check_in`, `check_out`)
+- `safety_incidents` (append-only with severity)
 
----
+### UX flow
+- During enrollment checkout completion, require waiver signature before class start.
+- Instructor class roster includes “Safety Card” quick view (contacts + allergies + pickup list).
+- Check-out requires authorized guardian confirmation and signature/PIN.
 
-### 3) "First 10" Star Instructor Strategy
-
-#### Cohort composition targets
-- 3 arts-primary educators with strong literacy integration.
-- 3 STEM-primary educators with hands-on project pedagogy.
-- 2 special education / neurodiversity-support specialists.
-- 2 cross-disciplinary master teachers with parent trust equity.
-
-#### Sourcing channels
-- Existing Renaissance Kids alumni instructors.
-- Parent referrals with demonstrated outcomes.
-- Local teacher networks and arts organizations.
-
-#### Concierge onboarding model (4-week sprint)
-- Week 1: trust checks + profile setup white-glove support.
-- Week 2: lesson artifact review and badge pathway setup.
-- Week 3: safety simulation + insurance completion.
-- Week 4: launch readiness, listing optimization, and first booking push.
-
-#### Success criteria for first 10
-- 100% pass trust stack before launch.
-- Average parent session rating >= 4.8/5 after first 20 sessions.
-- >= 80% complete portfolio evidence uploads each month.
-- >= 70% rebooking rate within first 60 days.
+### RLS
+- Parents: access only their own students + signatures.
+- Instructors: access safety info only for actively enrolled students.
+- District viewers: read-only to compliant report views only.
 
 ---
 
-## Priority 3: Progress Portfolios & State Compliance
+## 2) Priority: Instructor Onboarding & Vetting
 
-### 1) Built-in Documentation for State Standards (NYS first)
+## 2.1 Gated Onboarding Pipeline
 
-#### Data model essentials
-- `LearningStandard` (state, subject, grade band, code, description).
-- `SessionPlan` linked to selected standards.
-- `StudentEvidence` (photo, artifact, note, assessment tag).
-- `MasterySignal` (introduced/practiced/demonstrated).
+Implement onboarding stages in `instructor_profiles.onboarding_stage`:
+1. `profile_started`
+2. `identity_verified`
+3. `background_cleared`
+4. `credentials_reviewed`
+5. `safety_certified`
+6. `approved`
 
-#### Instructor workflow (low-friction)
-1. Build or clone a class template.
-2. Pre-tag standards once at template level.
-3. During/after class, tap quick evidence chips (photo + note + standard check).
-4. Auto-suggest standards from activity type to reduce manual tagging.
+Add quality score fields:
+- `vetting_score numeric`
+- `vetting_notes text`
+- `reviewed_by uuid`
+- `reviewed_at timestamptz`
 
-#### Quality controls
-- Require at least one evidence item per standard claimed each reporting cycle.
-- Flag over-tagging (too many standards for short sessions).
-- Parent preview mode before export lock.
+### Reviewer rubric (stored in `instructor_review_scores`)
+- Pedagogy quality
+- Arts-academics integration
+- Classroom safety readiness
+- Communication and family trust
+- Experience and reliability
 
----
-
-### 2) Exportable Quarterly Portfolios
-
-#### Export formats
-- **District submission report (PDF):** concise, standards-aligned narrative + attendance + evidence index.
-- **Family showcase report (PDF):** visual, photo-forward highlights and growth reflections.
-- **Data export (CSV/JSON):** standards mappings and session logs for advanced parent records.
-
-#### Portfolio structure (quarterly)
-- Cover page (student name, grade, term, instructor roster).
-- Subject progress summary with standards references.
-- Evidence gallery (captioned photos/work samples).
-- Skills growth narrative and next-quarter goals.
-- Attendance and instructional hours summary.
-
-#### Compliance operations
-- NY-first rules pack with district-agnostic defaults and override support.
-- Parent/legal guardian e-sign acknowledgment before submission export.
-- Immutable archive of exported reports and source evidence for audits.
+Activation rule:
+- `is_marketplace_approved=true` only when all hard gates are passed and score threshold is met.
 
 ---
 
-## 90-Day Execution Plan
+## 2.2 First 5 Micro-Credentials
 
-### Days 1-30 (Foundation)
-- Implement trust stack schema and status engine.
-- Integrate background check provider in sandbox + webhook handling.
-- Launch insurance upload/review queue MVP.
-- Define first five badges and rubric scoring cards.
+Create tables:
+- `credential_definitions`
+- `instructor_credentials`
+- `credential_evidence`
 
-### Days 31-60 (Pilot)
-- Onboard First 10 with concierge process.
-- Run safety protocol simulations and incident drill.
-- Launch NY standards tagging alpha with 2-3 pilot instructors.
-- Generate first portfolio exports and gather parent feedback.
+Initial credential set:
+1. `background_cleared`
+2. `verified_arts_integrated_educator`
+3. `stem_teaching_verified`
+4. `special_needs_accessible_l1`
+5. `safety_protocol_certified`
 
-### Days 61-90 (Scale Readiness)
-- Automate reminder cadences (rechecks, insurance renewals, badge expirations).
-- Add parent-facing trust badges to listing cards.
-- Refine standards recommendation logic based on pilot usage.
-- Publish launch playbook and KPI dashboard for marketplace expansion.
+Each credential includes:
+- Criteria JSON
+- Issued date / expiry date
+- Verifier metadata
+- Evidence links
+
+Display these as shadcn badge components on public instructor cards.
 
 ---
 
-## KPI Dashboard (Launch-Critical)
+## 2.3 “First 10” Instructor Launch Program
 
-### Trust & safety
-- Background check completion rate.
-- Median time to clear trust stack.
-- Insurance verification pass rate.
-- Safety incident rate per 1,000 student-hours.
+### Selection targets
+- 3 arts-led + literacy integrated
+- 3 STEM-led
+- 2 special-needs experienced
+- 2 cross-disciplinary anchors
 
-### Instructor quality
-- Vetting pass rate.
-- Badge attainment distribution.
-- Parent rating and qualitative trust sentiment.
-- Rebooking rate and instructor retention.
+### 4-week execution
+- Week 1: trust stack + profile completion
+- Week 2: lesson artifact + credential scoring
+- Week 3: safety protocol simulation + insurance completion
+- Week 4: listing QA + first bookings + parent feedback loop
 
-### Compliance & portfolio usage
-- Standards-tagging completion per session.
-- Quarterly export completion rate.
-- Parent satisfaction with report usefulness.
-- District acceptance/no-revision rate (where tracked).
+### KPI targets for cohort
+- 100% trust stack completed pre-launch
+- ≥4.8 average parent rating
+- ≥70% rebooking in first 60 days
+- <5% onboarding abandonment after consent
 
-This sequence gives you a defensible safety/compliance foundation first, while still enabling a controlled growth path with high-quality instructors and parent-ready reporting.
+---
+
+## 3) Priority: Progress Portfolios & State Compliance
+
+## 3.1 NYS Standards-Aligned Documentation
+
+### Core tables
+- `learning_standards` (state, subject, grade_band, code)
+- `class_standard_mappings`
+- `student_evidence`
+- `portfolio_entries`
+
+### Instructor workflow in app
+1. Instructor maps class template to standards once.
+2. During/after class, instructor logs evidence (photo/work/note).
+3. Evidence links to standards + student + class session.
+4. Parent dashboard shows progress by standard mastery state.
+
+### Quality controls
+- Prevent “standards over-tagging” with validation rules.
+- Require minimum evidence count per standard per quarter.
+- Keep evidence immutable after quarterly export lock (with admin override event log).
+
+---
+
+## 3.2 Exportable Quarterly Portfolios
+
+### Export products
+- **District PDF:** standards-aligned summary + attendance + hours
+- **Family PDF:** visual showcase + growth narrative
+- **CSV/JSON:** machine-readable evidence and standards mapping
+
+### Delivery architecture
+- Next.js route handler generates export jobs.
+- Supabase function/queue compiles artifacts.
+- Files stored in Supabase Storage with signed URLs and expiry.
+- Export event logged in `portfolio_export_events` for audit.
+
+---
+
+## 4) API and RLS Integration Checklist
+
+## API routes
+- `POST /api/checkout`
+  - create `payment_intents`
+  - return Stripe session URL
+- `POST /api/webhooks/stripe`
+  - verify signature
+  - mark payment success
+  - create `enrollments`
+- `POST /api/webhooks/checkr`
+  - verify signature
+  - update `instructor_profiles.background_check_status`
+  - insert `background_check_events`
+
+## RLS enforcement points
+- Parents only see their own `students` + related records.
+- Instructors only see enrolled students and class-linked evidence.
+- Games unlock from active `enrollments` only.
+- Audit/event tables are append-only.
+- District viewers are read-only via limited views.
+
+Use helper function in policies:
+```sql
+create function has_role(text) returns boolean;
+```
+
+---
+
+## 5) 90-Day Technical Delivery Plan
+
+### Days 1-30 (Schema + Security)
+- Ship migrations for trust, insurance, safety, credentials, standards tables.
+- Add/verify RLS policies + role checks.
+- Implement Checkr + Stripe webhook hardening and audit logging.
+
+### Days 31-60 (Pilot Features)
+- Launch instructor onboarding stepper with trust gates.
+- Launch admin review queues for checks/insurance/credentials.
+- Pilot standards tagging + quarterly export with first 10 instructors.
+
+### Days 61-90 (Scale + Reliability)
+- Add reminder automation (recheck, renewal, credential expiry).
+- Add analytics dashboards for trust and portfolio completion.
+- Load/perf test webhook and export pipelines before broad launch.
+
+---
+
+## 6) Launch-Critical Metrics (Dashboard)
+
+### Trust & Safety
+- Median time from signup to `background_cleared`
+- Insurance verification pass rate
+- Safety incidents per 1,000 student-hours
+
+### Instructor Quality
+- Vetting pass rate
+- Credential completion rate by badge
+- Parent rating and rebooking rates
+
+### Compliance Reporting
+- Standards-tagged session rate
+- Quarterly export completion rate
+- District acceptance/no-revision rate
+
+This plan is now directly implementable against the current Next.js + Supabase architecture and RLS security model.
