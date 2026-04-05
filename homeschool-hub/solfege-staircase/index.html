@@ -28,15 +28,20 @@
     .message{background:#fff7e6;border:2px solid rgba(251,196,64,.55);border-radius:18px;padding:14px 14px;font-weight:650;margin-bottom:14px;}
     .play-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;}
     .btn{border:2px solid rgba(0,0,0,.25);border-radius:999px;padding:12px 16px;font-weight:800;cursor:pointer;background:#fff;}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;}
     .btn-primary{background:var(--rk-orange);color:#fff;border-color:rgba(0,0,0,.25);}
     .btn-secondary{background:var(--rk-yellow);color:#1c1c1c;}
     .staircase{display:grid;gap:10px;}
-    .step{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 14px;border-radius:18px;border:2px solid rgba(47,107,101,.18);background:#fff;box-shadow:0 10px 18px rgba(0,0,0,.06);user-select:none;}
-    .step[aria-disabled="true"]{opacity:.55;pointer-events:none;}
+    .step{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 14px;border-radius:18px;border:2px solid rgba(47,107,101,.18);background:#fff;box-shadow:0 10px 18px rgba(0,0,0,.06);user-select:none;cursor:pointer;}
     .solfege{font-weight:900;background:rgba(47,107,101,.12);color:var(--rk-green);padding:8px 12px;border-radius:999px;border:2px solid rgba(47,107,101,.18);min-width:90px;text-align:center;letter-spacing:.6px;}
     .note-letter{font-weight:900;background:rgba(251,196,64,.25);padding:8px 12px;border-radius:999px;border:2px solid rgba(0,0,0,.14);min-width:60px;text-align:center;}
+    .step.active{animation:glow .6s ease;box-shadow:0 0 25px 8px #FBC440!important;transform:scale(1.03);}
+    @keyframes glow{0%{box-shadow:0 0 0 0 rgba(251,196,64,.8);}70%{box-shadow:0 0 0 20px rgba(251,196,64,0);}100%{box-shadow:0 0 0 0 rgba(251,196,64,0);}}
+    #intervalChoices{display:none;gap:12px;margin-bottom:14px;}
+    .tutorial-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:10000;}
+    .modal-content{background:#fff;max-width:520px;padding:30px;border-radius:24px;text-align:center;box-shadow:0 20px 40px rgba(47,107,101,.3);}
     .footer-note{padding:12px 18px 18px;color:rgba(0,0,0,.55);font-weight:650;text-align:center;}
-    @media print{body{background:white!important;color:black!important;padding:0!important;}.game-container{background:white!important;border:2px solid #2F6B65!important;box-shadow:none!important;width:100%!important;max-width:100%!important;border-radius:0!important;}.btn,.score-board,.play-row,.footer-note{display:none!important;}main{padding:18px!important;}.staircase{margin-top:18px;gap:6px!important;}.step{background:white!important;color:black!important;border:1px solid #ccc!important;border-left:10px solid #2F6B65!important;box-shadow:none!important;page-break-inside:avoid;}.solfege{background:#eee!important;color:black!important;border:1px solid black!important;}.note-letter{background:white!important;border:1px dotted #666!important;}.message{border:1px solid #2F6B65!important;background:white!important;margin-top:18px!important;min-height:90px;text-align:left!important;}.message::before{content:"Teacher/Parent Notes:";font-weight:bold;display:block;margin-bottom:10px;}header::before{content:"Student Name: __________________________  Date: ____________";display:block;margin-bottom:10px;font-weight:bold;}}
+    @media print{body{background:white!important;color:black!important;padding:0!important;}.game-container{background:white!important;border:2px solid #2F6B65!important;box-shadow:none!important;width:100%!important;max-width:100%!important;border-radius:0!important;}.btn,.score-board,.play-row,#intervalChoices,.footer-note{display:none!important;}main{padding:18px!important;}.staircase{margin-top:18px;gap:6px!important;}.step{background:white!important;color:black!important;border:1px solid #ccc!important;border-left:10px solid #2F6B65!important;box-shadow:none!important;page-break-inside:avoid;}.solfege{background:#eee!important;color:black!important;border:1px solid black!important;}.note-letter{background:white!important;border:1px dotted #666!important;}.message{border:1px solid #2F6B65!important;background:white!important;margin-top:18px!important;min-height:90px;text-align:left!important;}.message::before{content:"Teacher/Parent Notes:";font-weight:bold;display:block;margin-bottom:10px;}header::before{content:"Student Name: __________________________  Date: ____________";display:block;margin-bottom:10px;font-weight:bold;}}
   </style>
 </head>
 <body>
@@ -56,30 +61,308 @@
     </header>
     <main>
       <div id="messageBox" class="message">Press <b>PLAY NOTE</b>, then click the matching step.</div>
+
       <div class="play-row">
         <button id="playBtn" class="btn btn-primary">▶ PLAY NOTE</button>
+        <button id="replayBtn" class="btn btn-secondary">🔁 Replay</button>
+        <button id="scaleBtn" class="btn">🎼 Play Scale</button>
         <button id="resetBtn" class="btn btn-secondary">↺ Reset Stars</button>
         <button class="btn" onclick="window.print()">🖨 Print Worksheet</button>
+        <button id="levelToggle" class="btn btn-secondary" disabled>🔓 Level 2 (Intervals)</button>
       </div>
+
+      <div id="intervalChoices">
+        <button class="btn btn-primary" data-interval="UP">⬆️ UP</button>
+        <button class="btn btn-primary" data-interval="SAME">⏺ SAME</button>
+        <button class="btn btn-primary" data-interval="DOWN">⬇️ DOWN</button>
+      </div>
+
       <div id="staircase" class="staircase" aria-label="Solfege staircase"></div>
+
+      <div style="margin-top:12px;text-align:center;font-size:.95rem;font-weight:700;color:var(--rk-green);">
+        Accuracy: <span id="accuracyDisplay">100%</span> • Streak: 🔥 <span id="streakDisplay">0</span>
+      </div>
     </main>
-    <div class="footer-note">"Light up learning through the arts." · renkids.org · (845) 452-4225</div>
+    <div class="footer-note">“Light up learning through the arts.” · renkids.org · (845) 452-4225</div>
   </div>
+
   <script>
-    const steps=[{solfege:"DO",letter:"C",freq:261.63},{solfege:"RE",letter:"D",freq:293.66},{solfege:"MI",letter:"E",freq:329.63},{solfege:"FA",letter:"F",freq:349.23},{solfege:"SOL",letter:"G",freq:392.00},{solfege:"LA",letter:"A",freq:440.00},{solfege:"TI",letter:"B",freq:493.88},{solfege:"DO",letter:"C",freq:523.25}];
-    let currentNoteIndex=null;let stepsEnabled=false;
-    let score=parseInt(localStorage.getItem('rk_solfegeScore'),10);if(Number.isNaN(score))score=0;
-    const staircase=document.getElementById("staircase");const messageBox=document.getElementById("messageBox");const scoreDisplay=document.getElementById("scoreDisplay");const playBtn=document.getElementById("playBtn");const resetBtn=document.getElementById("resetBtn");
+    const steps=[
+      {solfege:"DO",letter:"C",freq:261.63},
+      {solfege:"RE",letter:"D",freq:293.66},
+      {solfege:"MI",letter:"E",freq:329.63},
+      {solfege:"FA",letter:"F",freq:349.23},
+      {solfege:"SOL",letter:"G",freq:392.00},
+      {solfege:"LA",letter:"A",freq:440.00},
+      {solfege:"TI",letter:"B",freq:493.88},
+      {solfege:"DO",letter:"C",freq:523.25}
+    ];
+
+    let currentNoteIndex=null, intervalQuestion=null, level=1;
+    let score=parseInt(localStorage.getItem("rk_solfegeScore")||"0",10)||0;
+    let correctCount=0, totalAttempts=0, streak=0;
+    let firstVisit=!localStorage.getItem("rk_tutorialSeen");
+
+    const staircase=document.getElementById("staircase");
+    const messageBox=document.getElementById("messageBox");
+    const scoreDisplay=document.getElementById("scoreDisplay");
+    const playBtn=document.getElementById("playBtn");
+    const replayBtn=document.getElementById("replayBtn");
+    const scaleBtn=document.getElementById("scaleBtn");
+    const resetBtn=document.getElementById("resetBtn");
+    const levelToggle=document.getElementById("levelToggle");
+    const intervalChoices=document.getElementById("intervalChoices");
+    const accuracyDisplay=document.getElementById("accuracyDisplay");
+    const streakDisplay=document.getElementById("streakDisplay");
+
     let audioCtx=null;
-    function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();}
-    function playTone(freq,duration=0.7){ensureAudio();const osc=audioCtx.createOscillator();const gain=audioCtx.createGain();osc.type="sine";osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(0.35,audioCtx.currentTime+0.02);gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+duration);}
-    function renderStaircase(){staircase.innerHTML="";steps.forEach((s,idx)=>{const step=document.createElement("div");step.className="step";step.setAttribute("role","button");step.setAttribute("tabindex","0");step.setAttribute("aria-label","Step "+(idx+1)+": "+s.solfege+" ("+s.letter+")");step.dataset.index=idx;const left=document.createElement("div");left.className="solfege";left.textContent=s.solfege;const right=document.createElement("div");right.className="note-letter";right.textContent=s.letter;step.appendChild(left);step.appendChild(right);step.addEventListener("click",()=>handleStepClick(idx));step.addEventListener("keydown",(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();handleStepClick(idx);}});staircase.appendChild(step);});disableSteps(true);}
-    function disableSteps(disabled){const children=staircase.querySelectorAll(".step");children.forEach(el=>{el.setAttribute("aria-disabled",disabled?"true":"false");});}
-    function chooseNewNote(){currentNoteIndex=Math.floor(Math.random()*steps.length);stepsEnabled=true;disableSteps(false);playTone(steps[currentNoteIndex].freq);messageBox.innerHTML="Listen carefully… then click the matching step!";}
-    function handleStepClick(clickedIndex){if(!stepsEnabled||currentNoteIndex===null)return;if(clickedIndex===currentNoteIndex){score++;scoreDisplay.innerText=String(score);localStorage.setItem('rk_solfegeScore',String(score));messageBox.innerText="✅ CORRECT! That was "+steps[currentNoteIndex].solfege+" ("+steps[currentNoteIndex].letter+"). Great ear!";disableSteps(true);stepsEnabled=false;currentNoteIndex=null;}else{messageBox.innerText="Try again — listen once more, then choose the step that matches.";playTone(steps[currentNoteIndex].freq,0.6);}}
-    function resetScore(){score=0;scoreDisplay.innerText='0';localStorage.setItem('rk_solfegeScore','0');messageBox.innerText="✨ Score reset. Let's start a new climb!";disableSteps(true);stepsEnabled=false;currentNoteIndex=null;}
-    document.addEventListener("DOMContentLoaded",()=>{scoreDisplay.innerText=String(score);if(score>0){messageBox.innerText="👋 Welcome back! You have "+score+" stars. Press PLAY NOTE to keep climbing!";}});
-    playBtn.addEventListener("click",chooseNewNote);resetBtn.addEventListener("click",resetScore);renderStaircase();
+
+    function ensureAudio(){
+      if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==="suspended")audioCtx.resume();
+    }
+
+    function playTone(freq,duration=0.7,type="triangle"){
+      ensureAudio();
+      const osc=audioCtx.createOscillator();
+      const gain=audioCtx.createGain();
+      const gain2=audioCtx.createGain();
+      const osc2=audioCtx.createOscillator();
+
+      osc.type=type;
+      osc.frequency.value=freq;
+      osc2.type="sine";
+      osc2.frequency.value=freq*2;
+      gain2.gain.value=.15;
+
+      gain.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.4,audioCtx.currentTime+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration);
+
+      osc.connect(gain).connect(audioCtx.destination);
+      osc2.connect(gain2).connect(audioCtx.destination);
+      osc.start();
+      osc2.start();
+      osc.stop(audioCtx.currentTime+duration);
+      osc2.stop(audioCtx.currentTime+duration);
+    }
+
+    function highlightStep(idx){
+      const step=staircase.querySelector(`.step[data-index="${idx}"]`);
+      if(step){
+        step.classList.add("active");
+        setTimeout(()=>step.classList.remove("active"),800);
+      }
+    }
+
+    function renderStaircase(){
+      staircase.innerHTML="";
+      steps.forEach((s,idx)=>{
+        const step=document.createElement("div");
+        step.className="step";
+        step.setAttribute("role","button");
+        step.setAttribute("tabindex","0");
+        step.setAttribute("aria-label",`Step ${idx+1}: ${s.solfege} (${s.letter})`);
+        step.dataset.index=idx;
+
+        const left=document.createElement("div");
+        left.className="solfege";
+        left.textContent=s.solfege;
+
+        const right=document.createElement("div");
+        right.className="note-letter";
+        right.textContent=s.letter;
+
+        step.appendChild(left);
+        step.appendChild(right);
+        step.addEventListener("click",()=>handleStepClick(idx));
+        step.addEventListener("keydown",(e)=>{
+          if(e.key==="Enter"||e.key===" "){
+            e.preventDefault();
+            handleStepClick(idx);
+          }
+        });
+        staircase.appendChild(step);
+      });
+    }
+
+    function rkConfettiBurst(){
+      messageBox.animate([
+        {transform:"scale(1)",offset:0},
+        {transform:"scale(1.03)",offset:.5},
+        {transform:"scale(1)",offset:1}
+      ],{duration:550,easing:"ease-out"});
+    }
+
+    function makeIntervalQuestion(){
+      const firstIndex=Math.floor(Math.random()*steps.length);
+      const moveOptions=[-2,-1,0,1,2].filter((delta)=>{
+        const target=firstIndex+delta;
+        return target>=0 && target<steps.length;
+      });
+      const delta=moveOptions[Math.floor(Math.random()*moveOptions.length)];
+      const secondIndex=firstIndex+delta;
+      const correct=delta===0?"SAME":delta>0?"UP":"DOWN";
+      return {firstIndex,secondIndex,correct};
+    }
+
+    function updateLevelUnlock(){
+      const unlocked=score>=15;
+      levelToggle.disabled=!unlocked;
+      levelToggle.textContent=unlocked
+        ? (level===1?"🔓 Level 2 (Intervals)":"🔒 Back to Level 1")
+        : `🔒 Level 2 unlocks at 15 stars (${score}/15)`;
+    }
+
+    function updateStats(){
+      const acc=totalAttempts?Math.round((correctCount/totalAttempts)*100):100;
+      accuracyDisplay.textContent=`${acc}%`;
+      streakDisplay.textContent=String(streak);
+      scoreDisplay.textContent=String(score);
+      updateLevelUnlock();
+    }
+
+    function chooseNewNote(){
+      intervalChoices.style.display=level===2?"flex":"none";
+      playBtn.textContent=level===2?"▶ PLAY INTERVAL":"▶ PLAY NOTE";
+
+      if(level===2){
+        intervalQuestion=makeIntervalQuestion();
+        currentNoteIndex=null;
+        highlightStep(intervalQuestion.firstIndex);
+        playTone(steps[intervalQuestion.firstIndex].freq,0.45,"triangle");
+        setTimeout(()=>{
+          highlightStep(intervalQuestion.secondIndex);
+          playTone(steps[intervalQuestion.secondIndex].freq,0.45,"triangle");
+        },650);
+        messageBox.innerHTML="🎧 Did it go <strong>UP</strong>, <strong>DOWN</strong>, or stay <strong>SAME</strong>?";
+        return;
+      }
+
+      intervalQuestion=null;
+      currentNoteIndex=Math.floor(Math.random()*steps.length);
+      highlightStep(currentNoteIndex);
+      playTone(steps[currentNoteIndex].freq);
+      messageBox.innerHTML="Listen… then click the matching step!";
+    }
+
+    function handleStepClick(clickedIndex){
+      if(level===2||currentNoteIndex===null)return;
+      totalAttempts++;
+      if(clickedIndex===currentNoteIndex){
+        score++;
+        correctCount++;
+        streak++;
+        localStorage.setItem("rk_solfegeScore",String(score));
+        messageBox.innerHTML=`✅ <strong>${steps[currentNoteIndex].solfege}</strong>! Now <em>sing it back</em>! 🎤`;
+        if(score%10===0)rkConfettiBurst();
+        updateStats();
+        setTimeout(chooseNewNote,1400);
+      }else{
+        streak=0;
+        messageBox.textContent="Try again!";
+        playTone(steps[currentNoteIndex].freq,0.6);
+        updateStats();
+      }
+    }
+
+    function handleIntervalChoice(e){
+      const guess=e.target.getAttribute("data-interval");
+      if(!guess||!intervalQuestion)return;
+      totalAttempts++;
+      if(guess===intervalQuestion.correct){
+        score++;
+        correctCount++;
+        streak++;
+        messageBox.innerHTML=`✅ Correct! It went <strong>${guess}</strong>. Sing the two notes! 🎤`;
+        if(score%10===0)rkConfettiBurst();
+      }else{
+        streak=0;
+        messageBox.innerHTML="❌ Listen again.";
+      }
+      localStorage.setItem("rk_solfegeScore",String(score));
+      updateStats();
+      setTimeout(chooseNewNote,1600);
+    }
+
+    function resetScore(){
+      score=0;
+      correctCount=0;
+      totalAttempts=0;
+      streak=0;
+      level=1;
+      currentNoteIndex=null;
+      intervalQuestion=null;
+      localStorage.setItem("rk_solfegeScore","0");
+      messageBox.textContent="✨ Score reset. Let's start a new climb!";
+      updateStats();
+      intervalChoices.style.display="none";
+      playBtn.textContent="▶ PLAY NOTE";
+    }
+
+    function showTutorial(){
+      if(!firstVisit)return;
+      const modal=document.createElement("div");
+      modal.className="tutorial-modal";
+      modal.innerHTML=`
+        <div class="modal-content">
+          <h2>Welcome to Solfege Staircase! 🎵</h2>
+          <p>Climb the stairs by listening and matching notes.<br>Level 2 trains your ear for direction.</p>
+          <p>After every correct answer, <strong>sing the note back</strong> — that's how real musicians learn!</p>
+          <button class="btn btn-primary" style="margin-top:20px;">Got it — let's climb!</button>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector("button").onclick=()=>{
+        modal.remove();
+        localStorage.setItem("rk_tutorialSeen","true");
+        firstVisit=false;
+        chooseNewNote();
+      };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+      renderStaircase();
+      scoreDisplay.textContent=String(score);
+      updateStats();
+      if(firstVisit)setTimeout(showTutorial,600);
+      else messageBox.innerHTML=`👋 Welcome back! You have <strong>${score}</strong> stars.`;
+    });
+
+    playBtn.addEventListener("click",chooseNewNote);
+    replayBtn.addEventListener("click",()=>{
+      if(level===2&&intervalQuestion){
+        highlightStep(intervalQuestion.firstIndex);
+        playTone(steps[intervalQuestion.firstIndex].freq,0.45);
+        setTimeout(()=>{
+          highlightStep(intervalQuestion.secondIndex);
+          playTone(steps[intervalQuestion.secondIndex].freq,0.45);
+        },550);
+      }else if(currentNoteIndex!==null){
+        highlightStep(currentNoteIndex);
+        playTone(steps[currentNoteIndex].freq);
+      }
+    });
+    scaleBtn.addEventListener("click",()=>{
+      let i=0;
+      const playNext=()=>{
+        if(i<steps.length){
+          highlightStep(i);
+          playTone(steps[i].freq,0.4);
+          i++;
+          setTimeout(playNext,380);
+        }
+      };
+      playNext();
+    });
+    levelToggle.addEventListener("click",()=>{
+      if(levelToggle.disabled)return;
+      level=level===1?2:1;
+      messageBox.textContent=level===2?"✨ Level 2: Listen for direction!":"🎵 Level 1: Find the matching note!";
+      updateLevelUnlock();
+      chooseNewNote();
+    });
+    intervalChoices.addEventListener("click",handleIntervalChoice);
+    resetBtn.addEventListener("click",resetScore);
   </script>
 </body>
 </html>
