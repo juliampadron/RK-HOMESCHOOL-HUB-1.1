@@ -1,1 +1,896 @@
-Schema + RLS policies content here.
+-- ============================================================================
+-- RENAISSANCE KIDS HOMESCHOOL PLATFORM - DATABASE SCHEMA & RLS POLICIES
+-- ============================================================================
+-- This schema implements:
+-- 1. RBAC with 4 roles (guest, registered, verified_family, admin, district_viewer)
+-- 2. Payment → Enrollment → Game Access chain
+-- 3. Multi-tenant RLS security
+-- 4. Audit logging for compliance
+-- 5. Background check tracking
+-- 6. Portfolio system aligned with NYS standards
+-- ============================================================================
+
+-- ============================================================================
+-- PART 1: CORE USER & FAMILY MANAGEMENT
+-- ============================================================================
+
+-- Extend profiles table with full user information
+CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+    role VARCHAR(50) NOT NULL DEFAULT 'registered' CHECK (role IN ('guest', 'registered', 'verified_family', 'instructor', 'admin', 'district_viewer')),
+    username VARCHAR(255) NOT NULL UNIQUE,
+    full_name VARCHAR(255),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(50),
+    background_check_status VARCHAR(50) DEFAULT 'not_started' CHECK (background_check_status IN ('not_started', 'pending', 'approved', 'rejected', 'expired')),
+    background_check_date TIMESTAMP,
+    background_check_expiry TIMESTAMP,
+    insurance_verified BOOLEAN DEFAULT FALSE,
+    insurance_expiry TIMESTAMP,
+    bio TEXT,
+    avatar_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Family groups for parent/student relationships
+CREATE TABLE IF NOT EXISTS families (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    family_name VARCHAR(255) NOT NULL,
+    primary_contact_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(50) DEFAULT 'NY',
+    zip_code VARCHAR(20),
+    district VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Family membership (students and parents in families)
+CREATE TABLE IF NOT EXISTS family_memberships (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    relationship VARCHAR(50) NOT NULL CHECK (relationship IN ('parent', 'guardian', 'student')),
+    is_primary BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(family_id, profile_id)
+);
+
+-- Student-specific information
+CREATE TABLE IF NOT EXISTS students (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
+    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
+    grade_level VARCHAR(50),
+    date_of_birth DATE,
+    special_needs TEXT,
+    learning_style TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 2: CLASS & INSTRUCTOR MANAGEMENT
+-- ============================================================================
+
+-- Classes offered by instructors
+CREATE TABLE IF NOT EXISTS classes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    instructor_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    subject_area VARCHAR(100) NOT NULL,
+    grade_levels VARCHAR(100),
+    max_students INTEGER,
+    price DECIMAL(10, 2) NOT NULL,
+    duration_weeks INTEGER,
+    session_duration_minutes INTEGER,
+    sessions_per_week INTEGER,
+    start_date DATE,
+    end_date DATE,
+    schedule_details TEXT,
+    location_type VARCHAR(50) CHECK (location_type IN ('online', 'in_person', 'hybrid')),
+    location_address TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    is_featured BOOLEAN DEFAULT FALSE,
+    materials_included TEXT,
+    prerequisites TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 3: PAYMENT & ENROLLMENT CHAIN
+-- ============================================================================
+
+-- Payment records (Square integration)
+CREATE TABLE IF NOT EXISTS payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    square_payment_id VARCHAR(255) UNIQUE,
+    square_order_id VARCHAR(255),
+    payer_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'USD',
+    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'completed', 'failed', 'refunded', 'cancelled')),
+    payment_method VARCHAR(50),
+    description TEXT,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Enrollment records (linked to payments)
+CREATE TABLE IF NOT EXISTS enrollments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+    payment_id UUID REFERENCES payments(id) ON DELETE SET NULL,
+    enrolled_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'withdrawn', 'cancelled')),
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completion_date TIMESTAMP,
+    withdrawal_reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(class_id, student_id)
+);
+
+-- ============================================================================
+-- PART 4: GAME SYSTEM WITH RLS ACCESS CONTROL
+-- ============================================================================
+
+-- Games catalog
+CREATE TABLE IF NOT EXISTS games (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    subject_area VARCHAR(100),
+    grade_levels VARCHAR(100),
+    difficulty_level VARCHAR(50) CHECK (difficulty_level IN ('beginner', 'intermediate', 'advanced')),
+    file_path TEXT NOT NULL,
+    thumbnail_url TEXT,
+    is_public BOOLEAN DEFAULT FALSE,
+    requires_enrollment BOOLEAN DEFAULT FALSE,
+    class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
+    nys_standards TEXT[],
+    estimated_time_minutes INTEGER,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Game enrollments (automatic via payment/class enrollment)
+CREATE TABLE IF NOT EXISTS game_enrollments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+    enrollment_id UUID REFERENCES enrollments(id) ON DELETE CASCADE,
+    access_granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    access_expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(game_id, student_id)
+);
+
+-- Student progress on games
+CREATE TABLE IF NOT EXISTS student_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+    game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+    score INTEGER DEFAULT 0,
+    completion_percentage DECIMAL(5, 2) DEFAULT 0,
+    time_spent_minutes INTEGER DEFAULT 0,
+    attempts INTEGER DEFAULT 0,
+    last_played_at TIMESTAMP,
+    progress_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, game_id)
+);
+
+-- ============================================================================
+-- PART 5: PORTFOLIO SYSTEM (NYS STANDARDS ALIGNMENT)
+-- ============================================================================
+
+-- NYS Learning Standards catalog
+CREATE TABLE IF NOT EXISTS nys_standards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code VARCHAR(50) NOT NULL UNIQUE,
+    subject VARCHAR(100) NOT NULL,
+    grade_level VARCHAR(50),
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Student portfolio items (work samples)
+CREATE TABLE IF NOT EXISTS portfolio_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    item_type VARCHAR(50) CHECK (item_type IN ('worksheet', 'project', 'assessment', 'artwork', 'writing', 'video', 'photo', 'other')),
+    file_url TEXT,
+    file_type VARCHAR(50),
+    subject_area VARCHAR(100),
+    date_completed DATE,
+    nys_standards TEXT[],
+    instructor_notes TEXT,
+    parent_notes TEXT,
+    grade_or_score VARCHAR(50),
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 6: INSTRUCTOR UPLOADS & MATERIALS
+-- ============================================================================
+
+-- Instructor-uploaded materials
+CREATE TABLE IF NOT EXISTS instructor_uploads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    instructor_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    file_type VARCHAR(50) CHECK (file_type IN ('game', 'worksheet', 'presentation', 'video', 'document', 'image', 'other')),
+    file_url TEXT NOT NULL,
+    file_size_bytes BIGINT,
+    mime_type VARCHAR(100),
+    is_public BOOLEAN DEFAULT FALSE,
+    download_count INTEGER DEFAULT 0,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 7: DISTRICT REPORTING & COMPLIANCE
+-- ============================================================================
+
+-- Quarterly reports for district compliance
+CREATE TABLE IF NOT EXISTS quarterly_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
+    quarter VARCHAR(10) NOT NULL,
+    year INTEGER NOT NULL,
+    report_data JSONB NOT NULL,
+    pdf_url TEXT,
+    submitted_at TIMESTAMP,
+    submitted_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    district_reviewed BOOLEAN DEFAULT FALSE,
+    district_reviewer_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    district_review_date TIMESTAMP,
+    district_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, quarter, year)
+);
+
+-- ============================================================================
+-- PART 8: AUDIT LOGGING FOR COMPLIANCE
+-- ============================================================================
+
+-- Audit log for critical actions
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    action VARCHAR(255) NOT NULL,
+    entity_type VARCHAR(100) NOT NULL,
+    entity_id UUID,
+    old_values JSONB,
+    new_values JSONB,
+    ip_address VARCHAR(50),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 9: BACKGROUND CHECK TRACKING (CHECKR INTEGRATION)
+-- ============================================================================
+
+-- Background check records
+CREATE TABLE IF NOT EXISTS background_checks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    checkr_candidate_id VARCHAR(255),
+    checkr_report_id VARCHAR(255),
+    status VARCHAR(50) NOT NULL CHECK (status IN ('initiated', 'pending', 'consider', 'clear', 'suspended', 'disputed')),
+    result VARCHAR(50),
+    adjudication VARCHAR(50),
+    completed_at TIMESTAMP,
+    expires_at TIMESTAMP,
+    report_url TEXT,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- PART 10: INDEXES FOR PERFORMANCE
+-- ============================================================================
+
+-- Profiles
+CREATE INDEX IF NOT EXISTS idx_profiles_user_id ON profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+
+-- Family memberships
+CREATE INDEX IF NOT EXISTS idx_family_memberships_family_id ON family_memberships(family_id);
+CREATE INDEX IF NOT EXISTS idx_family_memberships_profile_id ON family_memberships(profile_id);
+
+-- Students
+CREATE INDEX IF NOT EXISTS idx_students_profile_id ON students(profile_id);
+CREATE INDEX IF NOT EXISTS idx_students_family_id ON students(family_id);
+
+-- Classes
+CREATE INDEX IF NOT EXISTS idx_classes_instructor_id ON classes(instructor_id);
+CREATE INDEX IF NOT EXISTS idx_classes_is_active ON classes(is_active);
+CREATE INDEX IF NOT EXISTS idx_classes_subject_area ON classes(subject_area);
+
+-- Payments
+CREATE INDEX IF NOT EXISTS idx_payments_payer_id ON payments(payer_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_square_payment_id ON payments(square_payment_id);
+
+-- Enrollments
+CREATE INDEX IF NOT EXISTS idx_enrollments_class_id ON enrollments(class_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_student_id ON enrollments(student_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_payment_id ON enrollments(payment_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
+
+-- Games
+CREATE INDEX IF NOT EXISTS idx_games_slug ON games(slug);
+CREATE INDEX IF NOT EXISTS idx_games_is_public ON games(is_public);
+CREATE INDEX IF NOT EXISTS idx_games_class_id ON games(class_id);
+
+-- Game enrollments
+CREATE INDEX IF NOT EXISTS idx_game_enrollments_game_id ON game_enrollments(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_enrollments_student_id ON game_enrollments(student_id);
+
+-- Student progress
+CREATE INDEX IF NOT EXISTS idx_student_progress_student_id ON student_progress(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_progress_game_id ON student_progress(game_id);
+
+-- Portfolio items
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_student_id ON portfolio_items(student_id);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_date_completed ON portfolio_items(date_completed);
+
+-- Instructor uploads
+CREATE INDEX IF NOT EXISTS idx_instructor_uploads_instructor_id ON instructor_uploads(instructor_id);
+CREATE INDEX IF NOT EXISTS idx_instructor_uploads_class_id ON instructor_uploads(class_id);
+
+-- Quarterly reports
+CREATE INDEX IF NOT EXISTS idx_quarterly_reports_student_id ON quarterly_reports(student_id);
+CREATE INDEX IF NOT EXISTS idx_quarterly_reports_family_id ON quarterly_reports(family_id);
+CREATE INDEX IF NOT EXISTS idx_quarterly_reports_year_quarter ON quarterly_reports(year, quarter);
+
+-- Audit logs
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_type ON audit_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+
+-- Background checks
+CREATE INDEX IF NOT EXISTS idx_background_checks_profile_id ON background_checks(profile_id);
+CREATE INDEX IF NOT EXISTS idx_background_checks_status ON background_checks(status);
+
+-- ============================================================================
+-- PART 11: ROW-LEVEL SECURITY (RLS) POLICIES
+-- ============================================================================
+
+-- Enable RLS on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE families ENABLE ROW LEVEL SECURITY;
+ALTER TABLE family_memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE enrollments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE games ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_enrollments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE student_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE instructor_uploads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quarterly_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE background_checks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE nys_standards ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- PROFILES - Users can read own profile, admins can read all
+-- ============================================================================
+
+CREATE POLICY profiles_select_own ON profiles
+    FOR SELECT
+    USING (auth.uid() = user_id OR EXISTS (
+        SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'
+    ));
+
+CREATE POLICY profiles_update_own ON profiles
+    FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY profiles_insert_own ON profiles
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+-- ============================================================================
+-- FAMILIES - Members can view their families
+-- ============================================================================
+
+CREATE POLICY families_select_member ON families
+    FOR SELECT
+    USING (
+        id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+CREATE POLICY families_update_primary ON families
+    FOR UPDATE
+    USING (
+        primary_contact_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY families_insert_own ON families
+    FOR INSERT
+    WITH CHECK (
+        primary_contact_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+-- ============================================================================
+-- STUDENTS - Family members and instructors (enrolled) can view
+-- ============================================================================
+
+CREATE POLICY students_select_family_or_instructor ON students
+    FOR SELECT
+    USING (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR id IN (
+            SELECT student_id FROM enrollments e
+            JOIN classes c ON e.class_id = c.id
+            WHERE c.instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+CREATE POLICY students_update_family ON students
+    FOR UPDATE
+    USING (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY students_insert_family ON students
+    FOR INSERT
+    WITH CHECK (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+-- ============================================================================
+-- CLASSES - Public can view active, instructors can manage own
+-- ============================================================================
+
+CREATE POLICY classes_select_all ON classes
+    FOR SELECT
+    USING (is_active = true OR instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()) OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'));
+
+CREATE POLICY classes_insert_instructor ON classes
+    FOR INSERT
+    WITH CHECK (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid() AND role = 'instructor')
+    );
+
+CREATE POLICY classes_update_instructor ON classes
+    FOR UPDATE
+    USING (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY classes_delete_instructor ON classes
+    FOR DELETE
+    USING (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+-- ============================================================================
+-- PAYMENTS - Users can view their own payments
+-- ============================================================================
+
+CREATE POLICY payments_select_own ON payments
+    FOR SELECT
+    USING (
+        payer_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+    );
+
+CREATE POLICY payments_insert_own ON payments
+    FOR INSERT
+    WITH CHECK (
+        payer_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+-- ============================================================================
+-- ENROLLMENTS - Students/families can view their enrollments, instructors can view class enrollments
+-- ============================================================================
+
+CREATE POLICY enrollments_select_student_or_instructor ON enrollments
+    FOR SELECT
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR class_id IN (
+            SELECT id FROM classes WHERE instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+CREATE POLICY enrollments_insert_family ON enrollments
+    FOR INSERT
+    WITH CHECK (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY enrollments_update_family_or_instructor ON enrollments
+    FOR UPDATE
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR class_id IN (
+            SELECT id FROM classes WHERE instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+-- ============================================================================
+-- GAMES - Public games viewable by all, enrolled games by enrolled students
+-- ============================================================================
+
+CREATE POLICY games_select_public_or_enrolled ON games
+    FOR SELECT
+    USING (
+        is_public = true
+        OR id IN (
+            SELECT game_id FROM game_enrollments
+            WHERE student_id IN (
+                SELECT s.id FROM students s
+                WHERE s.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+            )
+        )
+        OR created_by IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'instructor'))
+    );
+
+CREATE POLICY games_insert_instructor ON games
+    FOR INSERT
+    WITH CHECK (
+        created_by IN (SELECT id FROM profiles WHERE user_id = auth.uid() AND role IN ('instructor', 'admin'))
+    );
+
+CREATE POLICY games_update_creator ON games
+    FOR UPDATE
+    USING (
+        created_by IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY games_delete_creator ON games
+    FOR DELETE
+    USING (
+        created_by IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+-- ============================================================================
+-- GAME_ENROLLMENTS - Students can view own enrollments
+-- ============================================================================
+
+CREATE POLICY game_enrollments_select_own ON game_enrollments
+    FOR SELECT
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            WHERE s.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+    );
+
+-- System creates game enrollments automatically
+CREATE POLICY game_enrollments_insert_system ON game_enrollments
+    FOR INSERT
+    WITH CHECK (true);
+
+-- ============================================================================
+-- STUDENT_PROGRESS - Students can view/update own progress
+-- ============================================================================
+
+CREATE POLICY student_progress_select_own_or_family ON student_progress
+    FOR SELECT
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'instructor'))
+    );
+
+CREATE POLICY student_progress_insert_own ON student_progress
+    FOR INSERT
+    WITH CHECK (
+        student_id IN (
+            SELECT s.id FROM students s
+            WHERE s.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY student_progress_update_own ON student_progress
+    FOR UPDATE
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            WHERE s.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+-- ============================================================================
+-- PORTFOLIO_ITEMS - Family members can view/manage student portfolios
+-- ============================================================================
+
+CREATE POLICY portfolio_items_select_family ON portfolio_items
+    FOR SELECT
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+CREATE POLICY portfolio_items_insert_family ON portfolio_items
+    FOR INSERT
+    WITH CHECK (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY portfolio_items_update_family ON portfolio_items
+    FOR UPDATE
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY portfolio_items_delete_family ON portfolio_items
+    FOR DELETE
+    USING (
+        student_id IN (
+            SELECT s.id FROM students s
+            JOIN family_memberships fm ON s.family_id = fm.family_id
+            WHERE fm.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+-- ============================================================================
+-- INSTRUCTOR_UPLOADS - Instructors manage own uploads
+-- ============================================================================
+
+CREATE POLICY instructor_uploads_select_public_or_enrolled ON instructor_uploads
+    FOR SELECT
+    USING (
+        is_public = true
+        OR class_id IN (
+            SELECT e.class_id FROM enrollments e
+            WHERE e.student_id IN (
+                SELECT s.id FROM students s
+                WHERE s.profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+            )
+        )
+        OR instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+    );
+
+CREATE POLICY instructor_uploads_insert_own ON instructor_uploads
+    FOR INSERT
+    WITH CHECK (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid() AND role IN ('instructor', 'admin'))
+    );
+
+CREATE POLICY instructor_uploads_update_own ON instructor_uploads
+    FOR UPDATE
+    USING (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY instructor_uploads_delete_own ON instructor_uploads
+    FOR DELETE
+    USING (
+        instructor_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+    );
+
+-- ============================================================================
+-- QUARTERLY_REPORTS - Families and district viewers can access
+-- ============================================================================
+
+CREATE POLICY quarterly_reports_select_family_or_district ON quarterly_reports
+    FOR SELECT
+    USING (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+CREATE POLICY quarterly_reports_insert_family ON quarterly_reports
+    FOR INSERT
+    WITH CHECK (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+    );
+
+CREATE POLICY quarterly_reports_update_family_or_district ON quarterly_reports
+    FOR UPDATE
+    USING (
+        family_id IN (
+            SELECT family_id FROM family_memberships
+            WHERE profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        )
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'district_viewer'))
+    );
+
+-- ============================================================================
+-- AUDIT_LOGS - Read-only for admins
+-- ============================================================================
+
+CREATE POLICY audit_logs_select_admin ON audit_logs
+    FOR SELECT
+    USING (EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'));
+
+CREATE POLICY audit_logs_insert_all ON audit_logs
+    FOR INSERT
+    WITH CHECK (true);
+
+-- ============================================================================
+-- BACKGROUND_CHECKS - Users view own, admins view all
+-- ============================================================================
+
+CREATE POLICY background_checks_select_own_or_admin ON background_checks
+    FOR SELECT
+    USING (
+        profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+        OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+    );
+
+CREATE POLICY background_checks_insert_admin ON background_checks
+    FOR INSERT
+    WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'));
+
+CREATE POLICY background_checks_update_admin ON background_checks
+    FOR UPDATE
+    USING (EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'));
+
+-- ============================================================================
+-- NYS_STANDARDS - Public read access
+-- ============================================================================
+
+CREATE POLICY nys_standards_select_all ON nys_standards
+    FOR SELECT
+    USING (true);
+
+CREATE POLICY nys_standards_insert_admin ON nys_standards
+    FOR INSERT
+    WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin'));
+
+-- ============================================================================
+-- PART 12: FUNCTIONS & TRIGGERS
+-- ============================================================================
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Apply updated_at trigger to all tables
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_families_updated_at BEFORE UPDATE ON families FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_students_updated_at BEFORE UPDATE ON students FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_classes_updated_at BEFORE UPDATE ON classes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_enrollments_updated_at BEFORE UPDATE ON enrollments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_games_updated_at BEFORE UPDATE ON games FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_student_progress_updated_at BEFORE UPDATE ON student_progress FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_portfolio_items_updated_at BEFORE UPDATE ON portfolio_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_instructor_uploads_updated_at BEFORE UPDATE ON instructor_uploads FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_quarterly_reports_updated_at BEFORE UPDATE ON quarterly_reports FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_background_checks_updated_at BEFORE UPDATE ON background_checks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to automatically create game enrollments when a class enrollment is created
+CREATE OR REPLACE FUNCTION auto_enroll_class_games()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- When an enrollment becomes active, grant access to all games for that class
+    IF NEW.status = 'active' THEN
+        INSERT INTO game_enrollments (game_id, student_id, enrollment_id, access_granted_at)
+        SELECT g.id, NEW.student_id, NEW.id, CURRENT_TIMESTAMP
+        FROM games g
+        WHERE g.class_id = NEW.class_id AND g.requires_enrollment = true
+        ON CONFLICT (game_id, student_id) DO NOTHING;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER auto_enroll_games_on_class_enrollment
+AFTER INSERT OR UPDATE ON enrollments
+FOR EACH ROW
+EXECUTE FUNCTION auto_enroll_class_games();
+
+-- Function to create audit log entries
+CREATE OR REPLACE FUNCTION create_audit_log()
+RETURNS TRIGGER AS $$
+DECLARE
+    current_user_id UUID;
+BEGIN
+    SELECT id INTO current_user_id FROM profiles WHERE user_id = auth.uid();
+
+    INSERT INTO audit_logs (user_id, action, entity_type, entity_id, old_values, new_values)
+    VALUES (
+        current_user_id,
+        TG_OP,
+        TG_TABLE_NAME,
+        COALESCE(NEW.id, OLD.id),
+        CASE WHEN TG_OP IN ('UPDATE', 'DELETE') THEN row_to_json(OLD) ELSE NULL END,
+        CASE WHEN TG_OP IN ('INSERT', 'UPDATE') THEN row_to_json(NEW) ELSE NULL END
+    );
+
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply audit logging to critical tables
+CREATE TRIGGER audit_payments AFTER INSERT OR UPDATE OR DELETE ON payments FOR EACH ROW EXECUTE FUNCTION create_audit_log();
+CREATE TRIGGER audit_enrollments AFTER INSERT OR UPDATE OR DELETE ON enrollments FOR EACH ROW EXECUTE FUNCTION create_audit_log();
+CREATE TRIGGER audit_background_checks AFTER INSERT OR UPDATE OR DELETE ON background_checks FOR EACH ROW EXECUTE FUNCTION create_audit_log();
+CREATE TRIGGER audit_classes AFTER INSERT OR UPDATE OR DELETE ON classes FOR EACH ROW EXECUTE FUNCTION create_audit_log();
+
+-- ============================================================================
+-- END OF SCHEMA
+-- ============================================================================
