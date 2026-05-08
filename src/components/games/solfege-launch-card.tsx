@@ -1,39 +1,47 @@
 'use client';
 
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-type SolfegeLaunchCardProps = {
+interface SolfegeLaunchCardProps {
   studentId: string;
-  className?: string;
-};
+  studentName?: string;
+}
 
-export function SolfegeLaunchCard({ studentId, className }: SolfegeLaunchCardProps) {
-  const href = `/games/solfege-staircase?studentId=${encodeURIComponent(studentId)}`;
+export default function SolfegeLaunchCard({ studentId, studentName }: SolfegeLaunchCardProps) {
+  const gameUrl = `/games/solfege-staircase?studentId=${encodeURIComponent(studentId)}`;
 
   return (
-    <article
-      className={`rounded-3xl border-2 border-[#2F6B65]/20 bg-[#fdfbf7] p-5 shadow-sm ${className ?? ''}`.trim()}
-      aria-label="Solfege Staircase launch card"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-extrabold text-[#2F6B65]">🎵 Solfege Staircase</h3>
-          <p className="mt-1 text-sm text-black/70">
-            Practice pitch matching and interval direction with replay, scale mode, and sing-back prompts.
-          </p>
+    <Card className="border-2 border-[#2F6B65] bg-[#fdfbf7] shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#FBC440] text-2xl">🎵</div>
+          <div>
+            <CardTitle className="text-xl text-[#2F6B65]">Solfege Staircase</CardTitle>
+            <CardDescription className="font-medium text-[#F05A22]">Ear-training game</CardDescription>
+          </div>
         </div>
-        <span className="rounded-full bg-[#FBC440] px-3 py-1 text-xs font-black text-black">Music</span>
-      </div>
+      </CardHeader>
 
-      <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs font-semibold text-black/60">DO → RE → MI → FA → SOL → LA → TI → DO</span>
+      <CardContent className="space-y-3">
+        <p className="text-sm text-black/80">
+          Climb the musical stairs! Listen, match notes, and train your ear with Level 1 (note ID) and Level 2
+          (intervals). Perfect for building music theory and singing confidence.
+        </p>
+
+        {studentName && <p className="text-sm font-semibold text-[#2F6B65]">Playing for: {studentName}</p>}
+
         <Link
-          href={href}
-          className="rounded-full border-2 border-black/20 bg-[#F05A22] px-4 py-2 text-sm font-extrabold text-white transition hover:brightness-105"
+          href={gameUrl}
+          aria-label="Launch Solfege Staircase game"
+          className="inline-flex"
         >
-          Start Game
+          <Button className="bg-[#F05A22] font-bold text-white hover:bg-[#d94e1f]">▶ Play Solfege Staircase Now</Button>
         </Link>
-      </div>
-    </article>
+
+        <p className="text-xs font-semibold text-black/55">Progress is automatically saved</p>
+      </CardContent>
+    </Card>
   );
 }
