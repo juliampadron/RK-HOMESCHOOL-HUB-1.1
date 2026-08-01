@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rk-orange: #F05A22;
+  --rk-yellow: #FBC440;
+  --rk-green: #2F6B65;
+  --rk-blue: #2B59C3;
+  --foreground: #1a1a1a;
+  --background: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 3px solid var(--rk-orange);
+  outline-offset: 2px;
+}
