@@ -16,6 +16,11 @@ out/
 # Build artifacts
 dist/
 build/
+tsconfig.tsbuildinfo
+
+# Browser test artifacts
+test-results/
+playwright-report/
 
 # OS
 .DS_Store

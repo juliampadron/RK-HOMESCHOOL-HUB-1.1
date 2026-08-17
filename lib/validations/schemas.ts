@@ -8,21 +8,12 @@ const uiPartSchema = z.union([
   z.object({ type: z.string() }).passthrough(),
 ]);
 
-// Accept both ai 7.x UIMessage format (parts[]) and legacy { role, content } format.
-export const chatMessageSchema = z.union([
-  // ai 7.x UIMessage
-  z.object({
-    id: z.string().optional(),
-    role: z.enum(['user', 'assistant', 'system', 'tool']),
-    parts: z.array(uiPartSchema).optional(),
-    content: z.string().max(4096).optional(),
-  }),
-  // Legacy plain message
-  z.object({
-    role: z.enum(['user', 'assistant', 'system']),
-    content: z.string().min(1).max(4096),
-  }),
-]);
+// The platform now accepts the ai 7.x UIMessage contract only.
+export const chatMessageSchema = z.object({
+  id: z.string().optional(),
+  role: z.enum(['user', 'assistant', 'system', 'tool']),
+  parts: z.array(uiPartSchema).min(1),
+});
 
 export const chatRequestSchema = z.object({
   id: z.string().optional(),

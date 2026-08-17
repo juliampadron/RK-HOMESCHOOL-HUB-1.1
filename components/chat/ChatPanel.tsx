@@ -1,8 +1,8 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { TextStreamChatTransport } from 'ai';
-import { useRef, useEffect } from 'react';
+import { DefaultChatTransport } from 'ai';
+import { useEffect, useMemo, useRef } from 'react';
 
 interface ChatPanelProps {
   /** API endpoint for this assistant, e.g. "/api/chat/parent" */
@@ -19,14 +19,18 @@ export default function ChatPanel({
   placeholder = 'Type a message…',
   accentClass = 'bg-rk-green',
 }: ChatPanelProps) {
-  const { messages, sendMessage, status } = useChat({
-    transport: new TextStreamChatTransport({ api: endpoint }),
-  });
+  // Keep the transport stable across message/status re-renders. Recreate it only
+  // when the configured API endpoint changes.
+  const transport = useMemo(
+    () => new DefaultChatTransport({ api: endpoint }),
+    [endpoint]
+  );
 
+  const { messages, sendMessage, status } = useChat({ transport });
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to newest message
+  // Auto-scroll to newest message.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -35,6 +39,7 @@ export default function ChatPanel({
     e.preventDefault();
     const text = inputRef.current?.value.trim();
     if (!text || status === 'submitted' || status === 'streaming') return;
+
     sendMessage({ text });
     if (inputRef.current) inputRef.current.value = '';
   }
@@ -44,6 +49,8 @@ export default function ChatPanel({
   return (
     <section
       aria-label={title}
+      aria-busy={isLoading}
+      data-chat-status={status}
       className="flex flex-col h-[520px] border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden"
     >
       {/* Message list */}
@@ -60,7 +67,6 @@ export default function ChatPanel({
         )}
         {messages.map((msg) => {
           const isUser = msg.role === 'user';
-          // Extract text content from parts array (ai 7.x UIMessage format)
           const textContent = msg.parts
             .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
             .map((p) => p.text)
@@ -69,6 +75,8 @@ export default function ChatPanel({
           return (
             <div
               key={msg.id}
+              data-chat-role={msg.role}
+              data-chat-message-id={msg.id}
               className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
               <div
@@ -84,7 +92,7 @@ export default function ChatPanel({
           );
         })}
         {isLoading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" data-chat-thinking="true">
             <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-gray-400 animate-pulse">
               Thinking…
             </div>
@@ -100,6 +108,7 @@ export default function ChatPanel({
       >
         <input
           ref={inputRef}
+          data-chat-input="true"
           type="text"
           placeholder={placeholder}
           disabled={isLoading}
@@ -108,6 +117,7 @@ export default function ChatPanel({
         />
         <button
           type="submit"
+          data-chat-send="true"
           disabled={isLoading}
           aria-label="Send message"
           className={`px-4 py-2 rounded-lg text-white text-sm font-semibold ${accentClass} hover:opacity-90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-rk-green`}

@@ -7,7 +7,18 @@ export const metadata: Metadata = {
     'A friendly learning companion for Renaissance Kids homeschool students.',
 };
 
-export default function StudentHelperPage() {
+interface StudentHelperPageProps {
+  searchParams?: {
+    chatSmoke?: string;
+  };
+}
+
+export default function StudentHelperPage({
+  searchParams,
+}: StudentHelperPageProps) {
+  const useSmokeTestStream =
+    process.env.CHAT_SMOKE_TEST === '1' && searchParams?.chatSmoke === '1';
+
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-2xl mx-auto space-y-4">
@@ -19,7 +30,7 @@ export default function StudentHelperPage() {
           </p>
         </div>
         <ChatPanel
-          endpoint="/api/chat/student"
+          endpoint={useSmokeTestStream ? '/api/chat/mock' : '/api/chat/student'}
           title="Student Helper"
           placeholder="Ask me anything about your schoolwork…"
           accentClass="bg-rk-orange"

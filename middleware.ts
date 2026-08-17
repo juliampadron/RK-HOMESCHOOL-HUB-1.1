@@ -2,6 +2,12 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  // Deterministic browser smoke tests do not provision a Supabase project.
+  // This flag is supplied only by the local Playwright web server configuration.
+  if (process.env.CHAT_SMOKE_TEST === '1') {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
