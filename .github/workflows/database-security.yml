@@ -1,0 +1,46 @@
+name: Database security
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  migration-and-rls:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: rk_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Rebuild database and exercise role isolation
+        env:
+          DATABASE_URL: postgresql://postgres:test-only@localhost:5432/rk_test
+        run: scripts/test-database.sh
+      - name: Test forward upgrade from original PR 34 schema
+        env:
+          DATABASE_URL: postgresql://postgres:test-only@localhost:5432/rk_upgrade
+        run: |
+          psql postgresql://postgres:test-only@localhost:5432/rk_test -v ON_ERROR_STOP=1 -c 'CREATE DATABASE rk_upgrade'
+          scripts/test-database.sh upgrade
+  client-persistence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/client/package-lock.json
+      - run: npm ci --prefix tests/client
+      - run: npm test --prefix tests/client
