@@ -8,3 +8,4 @@ INSERT INTO public.game_sessions(student_id,game_slug,score,accuracy,streak)
  VALUES ('20000000-0000-0000-0000-000000000009','solfege-staircase',5,80,2);
 CREATE POLICY protected_resources ON public.hub_resources FOR SELECT TO authenticated USING (false);
 GRANT UPDATE(user_id) ON public.profiles TO authenticated;
+GRANT INSERT(played_at) ON public.game_sessions TO authenticated;

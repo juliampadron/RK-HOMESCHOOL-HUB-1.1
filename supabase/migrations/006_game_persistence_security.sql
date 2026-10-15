@@ -1,5 +1,5 @@
 -- Forward migration for both fresh installs and the original PR 34 schema.
--- Solfege persistence. Deliberately does not change resource or assessment access.
+-- Solfege persistence; remove original broad access without adding assessment writes.
 -- A deployed database must reconcile its history against docs/solfege-launch.md.
 BEGIN;
 
@@ -123,6 +123,19 @@ ALTER TABLE public.games ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.student_game_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.game_sessions ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.games, public.student_game_progress, public.game_sessions FROM PUBLIC, anon, authenticated;
+-- Table-level REVOKE does not remove pre-existing column privileges.
+DO $$
+DECLARE col RECORD;
+BEGIN
+  FOR col IN SELECT table_name, column_name FROM information_schema.columns
+    WHERE table_schema='public' AND table_name IN
+      ('games','game_sessions','student_game_progress','student_guardians')
+  LOOP
+    EXECUTE format('REVOKE SELECT (%I), INSERT (%I), UPDATE (%I), REFERENCES (%I) ON public.%I FROM PUBLIC, anon, authenticated',
+      col.column_name, col.column_name, col.column_name, col.column_name, col.table_name);
+  END LOOP;
+END;
+$$;
 GRANT SELECT ON public.games TO authenticated;
 GRANT SELECT ON public.game_sessions TO authenticated;
 GRANT INSERT (student_id, game_slug, score, accuracy, streak, metadata) ON public.game_sessions TO authenticated;
