@@ -1,0 +1,11 @@
+{
+  "name": "rk-solfege-persistence-tests",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node persistence.mjs" },
+  "devDependencies": {
+    "react": "19.1.1",
+    "react-test-renderer": "19.1.1",
+    "typescript": "5.9.3"
+  }
+}
