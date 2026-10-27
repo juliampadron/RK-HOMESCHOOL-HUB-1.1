@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-slate-200; }
+  html { background: #fdfbf7; color: #1c1c1c; }
+  body { @apply m-0 min-h-screen bg-rk-cream font-sans text-slate-900; }
+  a { @apply text-rk-green underline-offset-4 hover:underline; }
+}
