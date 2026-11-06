@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Solfège Staircase Hero Image</title>
+  <desc id="desc">A colorful 3D staircase with musical notes floating upward.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7f4ee"/>
+      <stop offset="100%" stop-color="#f2eee7"/>
+    </linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="220%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+
+  <g transform="translate(190 520)" filter="url(#shadow)">
+    <g transform="translate(0 0)">
+      <polygon points="0,40 90,20 160,60 70,80" fill="#d84f1f"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#b5421a"/>
+      <polygon points="70,80 160,60 160,100 70,120" fill="#f05a22"/>
+    </g>
+    <g transform="translate(110 -48)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#d9a52e"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#bc8e26"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#fbc440"/>
+    </g>
+    <g transform="translate(220 -96)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#4f8f82"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#3f756a"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#6eafa1"/>
+    </g>
+    <g transform="translate(330 -144)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#2f6b65"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#24534f"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#3a7f78"/>
+    </g>
+    <g transform="translate(440 -192)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#d84f1f"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#b5421a"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#f05a22"/>
+    </g>
+    <g transform="translate(550 -240)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#d9a52e"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#bc8e26"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#fbc440"/>
+    </g>
+    <g transform="translate(660 -288)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#4f8f82"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#3f756a"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#6eafa1"/>
+    </g>
+    <g transform="translate(770 -336)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#4f8f82"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#3f756a"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#6eafa1"/>
+    </g>
+    <g transform="translate(880 -384)">
+      <polygon points="0,40 95,20 165,60 70,80" fill="#2f6b65"/>
+      <polygon points="0,40 0,80 70,120 70,80" fill="#24534f"/>
+      <polygon points="70,80 165,60 165,100 70,120" fill="#3a7f78"/>
+    </g>
+  </g>
+
+  <g font-family="system-ui, sans-serif" font-weight="700">
+    <text x="360" y="472" font-size="38" fill="#e67e22">♪</text>
+    <text x="435" y="430" font-size="42" fill="#6b9d86">♬</text>
+    <text x="540" y="386" font-size="34" fill="#e0b03f">♪</text>
+    <text x="640" y="335" font-size="42" fill="#e25d24">♬</text>
+    <text x="735" y="290" font-size="36" fill="#6b9d86">♪</text>
+    <text x="810" y="240" font-size="44" fill="#2f6b65">♬</text>
+  </g>
+</svg>
