@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive IHIP Alignment & Vocabulary Report</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Georgia&display=swap" rel="stylesheet">
+
+    <!-- Brand Configuration & Custom Styling -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rkOrange: '#F05A22',
+                        rkSunYellow: '#FBC440',
+                        rkSkin: '#F7C4A5',
+                        rkRed: '#E92929',
+                        rkGreen: '#48B749',
+                        rkBlue: '#2B59C3',
+                        rkPurple: '#8028A0',
+                        rkLines: '#2F6B65',
+                        warmBg: '#FAF8F5',
+                        warmCard: '#FFFFFF',
+                        textMain: '#2D3748'
+                    },
+                    fontFamily: {
+                        'sans': ['"Nunito"', 'sans-serif'],
+                        'serif': ['"Georgia"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+            overflow: hidden;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        body {
+            background-color: #FAF8F5;
+            color: #2D3748;
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 6px solid transparent;
+        }
+        .interactive-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .interactive-card.active {
+            background-color: #F0F4F8;
+            border-left-color: #F05A22;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #2B59C3;
+            color: #2B59C3;
+            font-weight: 800;
+        }
+
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 font-sans">
+
+    <div class="max-w-6xl mx-auto">
+
+        <header class="bg-warmCard rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-8 border-rkOrange">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-serif font-bold text-gray-900">IHIP Alignment & Vocabulary Report</h1>
+                    <h2 class="text-lg text-gray-500 font-semibold mt-1">Activity: Force Detective Training Zone</h2>
+                </div>
+                <div class="bg-orange-50 px-4 py-3 rounded-xl border border-orange-100 text-sm">
+                    <p><strong>Organization:</strong> Renaissance Kids, Inc.</p>
+                    <p><strong>Program:</strong> Homeschool Hub</p>
+                    <p><strong>Target Grades:</strong> K-3</p>
+                </div>
+            </div>
+            <p class="mt-4 text-gray-600 leading-relaxed">
+                This interactive report translates the traditional Individualized Home Instruction Plan (IHIP) documentation into an explorable dashboard. It details the alignment of the "Force Detective" module with New York State Elementary Science Standards and provides an interactive study guide for core physical science vocabulary.
+            </p>
+        </header>
+
+        <nav class="flex gap-6 mb-6 border-b border-gray-200 px-2">
+            <button onclick="switchTab('standards')" id="btn-standards" class="tab-btn active pb-3 text-lg font-bold text-gray-600 hover:text-rkBlue focus:outline-none">
+                📊 NYS Standards Tracker
+            </button>
+            <button onclick="switchTab('vocab')" id="btn-vocab" class="tab-btn pb-3 text-lg font-bold text-gray-600 hover:text-rkBlue focus:outline-none">
+                🧠 Interactive Vocabulary
+            </button>
+        </nav>
+
+        <section id="sec-standards" class="block animate-fade-in">
+            <div class="bg-warmCard rounded-2xl shadow-sm p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Curriculum Alignment Overview</h3>
+                <p class="text-gray-600 mb-8 border-l-4 border-rkBlue pl-4">
+                    <strong>Purpose of this section:</strong> This view provides a quantitative and qualitative breakdown of how the current learning activity satisfies specific New York State P-12 Science Learning Standards. Evaluators can use the chart to understand grade-level distribution and review the specific learning objectives achieved.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 flex flex-col items-center justify-center">
+                        <h4 class="text-center font-bold text-gray-700 mb-4">Standards Addressed by Grade Level</h4>
+                        <div class="chart-container">
+                            <canvas id="standardsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-gray-700 text-lg border-b pb-2">Evaluator Compliance Details</h4>
+                        <div id="standards-list-container" class="space-y-3 overflow-y-auto max-h-[400px] pr-2"></div>
+
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-100 mt-4">
+                            <h5 class="font-bold text-rkGreen mb-1">Instructional Notes</h5>
+                            <p class="text-sm text-gray-700">The student successfully engaged in hands-on, inquiry-based observations of physical science phenomena in their natural environment. The student formulated hypotheses and recorded empirical data in field notes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-vocab" class="hide animate-fade-in">
+            <div class="bg-warmCard rounded-2xl shadow-sm p-6 md:p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Science Safari Study Guide</h3>
+                <p class="text-gray-600 mb-8 border-l-4 border-rkOrange pl-4">
+                    <strong>Purpose of this section:</strong> This interactive matrix transforms standard vocabulary lists into an engaging study tool. Select any concept from the list on the left to reveal its definition, a real-world example, and an interactive conceptual demonstration on the right.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <div class="md:col-span-1 border-r border-gray-200 pr-0 md:pr-4 space-y-2" id="vocab-list"></div>
+
+                    <div class="md:col-span-2 pl-0 md:pl-4 flex flex-col">
+                        <div id="vocab-detail-empty" class="h-full flex flex-col items-center justify-center text-gray-400 p-8 border-2 border-dashed border-gray-200 rounded-xl">
+                            <div class="text-4xl mb-3">👈</div>
+                            <p class="font-bold text-lg">Select a term to explore!</p>
+                        </div>
+
+                        <div id="vocab-detail-content" class="hide h-full flex flex-col">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div id="v-icon" class="text-5xl bg-orange-50 w-20 h-20 flex items-center justify-center rounded-2xl shadow-sm border border-orange-100"></div>
+                                <div>
+                                    <h4 id="v-title" class="text-3xl font-black text-rkBlue"></h4>
+                                    <p id="v-pronounce" class="text-gray-500 font-mono text-sm tracking-wide"></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 p-5 rounded-xl border-l-4 border-rkBlue mb-4">
+                                <h5 class="text-xs font-bold uppercase text-rkBlue mb-1 tracking-wider">Definition</h5>
+                                <p id="v-def" class="text-gray-800 text-lg leading-relaxed"></p>
+                            </div>
+
+                            <div class="bg-yellow-50 p-5 rounded-xl border-l-4 border-rkSunYellow flex-grow">
+                                <h5 class="text-xs font-bold uppercase text-yellow-700 mb-1 tracking-wider">Real-World Example</h5>
+                                <p id="v-ex" class="text-gray-800 italic"></p>
+
+                                <div id="v-dynamic-zone" class="mt-6 flex justify-center items-center min-h-[120px]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const standardsData = [
+            {
+                grade: "Kindergarten", code: "K-PS2-1",
+                text: "Plan and conduct an investigation to compare the effects of different strengths or different directions of pushes and pulls on the motion of an object.",
+                context: "Addressed in Clues 1 & 2: pushing doors and pulling drawers."
+            },
+            {
+                grade: "Kindergarten", code: "K-PS2-2",
+                text: "Analyze data to determine if a design solution works as intended to change the speed or direction of an object with a push or a pull.",
+                context: "Addressed via the interactive observations of stopping and starting motion."
+            },
+            {
+                grade: "Grade 2", code: "2-PS1-2",
+                text: "Analyze data obtained from testing different materials to determine which materials have the properties that are best suited for an intended purpose.",
+                context: "Addressed in Clue 4: Friction observation comparing smooth floors to bumpy rugs."
+            },
+            {
+                grade: "Grade 3", code: "3-PS2-1",
+                text: "Plan and conduct an investigation to provide evidence of the effects of balanced and unbalanced forces on the motion of an object.",
+                context: "Addressed throughout the worksheet by observing objects at rest moving due to applied force."
+            },
+            {
+                grade: "Grade 3", code: "3-PS2-2",
+                text: "Make observations and/or measurements of an object’s motion to provide evidence that a pattern can be used to predict future motion.",
+                context: "Addressed in Clue 3: Gravity observation comparing dropping a feather vs. a ball."
+            }
+        ];
+
+        const vocabData = [
+            { id: "v1", term: "Force", pronounce: "fawrs", icon: "🚀", def: "A push or a pull on an object that makes it move, stop, or change direction.", ex: "Kicking a soccer ball." },
+            { id: "v2", term: "Push", pronounce: "poosh", icon: "✋", def: "Using your energy to move something away from your body.", ex: "Pushing a swing to make your friend go higher." },
+            { id: "v3", term: "Pull", pronounce: "pool", icon: "🪢", def: "Using your energy to bring something closer to your body.", ex: "Pulling a wagon up a hill." },
+            { id: "v4", term: "Gravity", pronounce: "grav-i-tee", icon: "🍎", def: "An invisible force that pulls objects toward the center of the Earth (or any big planet!). It's what keeps us from floating away!", ex: "An apple falling from a tree and hitting the ground." },
+            { id: "v5", term: "Friction", pronounce: "frik-shun", icon: "🛑", def: "A force that slows things down when two surfaces rub together.", ex: "The rubber brakes on your bicycle rubbing against the wheel to stop you." },
+            { id: "v6", term: "Centrifugal Force", pronounce: "sen-trif-yuh-guhl", icon: "🎠", def: "The feeling of being pushed outward when you are spinning around in a circle.", ex: "The feeling of flying outward when riding a merry-go-round at the playground." },
+            { id: "v7", term: "Electromagnetism", pronounce: "ee-lek-troh-mag-nuh-tiz-uhm", icon: "🧲", def: "An invisible magnetic field that can pull (attract) or push (repel) certain metals and charges.", ex: "Magnets sticking your beautiful artwork to the refrigerator!" },
+            { id: "v8", term: "Sound Waves", pronounce: "sound weyvz", icon: "🔊", def: "Invisible vibrations traveling through the air that your ears pick up so you can hear music and noise!", ex: "Plucking a guitar string makes it vibrate, sending sound waves to your ear." },
+            { id: "v9", term: "Light (Duality)", pronounce: "lahyt", icon: "✨", def: "Light travels as bouncy energy WAVES, but it is also made up of tiny little packets called PARTICLES (photons). It's both at the same time!", ex: "Sunlight warming your face and traveling through space." }
+        ];
+
+        let currentVocabId = null;
+
+        window.onload = function() {
+            initStandardsTab();
+            initVocabTab();
+        };
+
+        function switchTab(tabId) {
+            document.getElementById('sec-standards').classList.add('hide');
+            document.getElementById('sec-vocab').classList.add('hide');
+
+            document.getElementById('btn-standards').classList.remove('active');
+            document.getElementById('btn-vocab').classList.remove('active');
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hide');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+        }
+
+        function initStandardsTab() {
+            const listContainer = document.getElementById('standards-list-container');
+            standardsData.forEach(std => {
+                const item = document.createElement('div');
+                item.className = "bg-white p-4 rounded-lg border border-gray-200 shadow-sm";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-rkBlue bg-blue-50 px-2 py-1 rounded text-sm">${std.code}</span>
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">${std.grade}</span>
+                    </div>
+                    <p class="text-sm text-gray-800 mb-2">${std.text}</p>
+                    <p class="text-xs text-rkLines italic bg-gray-50 p-2 rounded">${std.context}</p>
+                `;
+                listContainer.appendChild(item);
+            });
+
+            const gradeCounts = { "Kindergarten": 0, "Grade 2": 0, "Grade 3": 0 };
+            standardsData.forEach(std => { gradeCounts[std.grade]++; });
+
+            const ctx = document.getElementById('standardsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(gradeCounts),
+                    datasets: [{
+                        data: Object.values(gradeCounts),
+                        backgroundColor: ['#2B59C3', '#48B749', '#F05A22'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: "'Nunito', sans-serif", size: 14 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} Standard(s)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function initVocabTab() {
+            const listEl = document.getElementById('vocab-list');
+
+            vocabData.forEach(item => {
+                const btn = document.createElement('div');
+                btn.className = "interactive-card bg-white p-3 rounded-lg border border-gray-100 flex items-center gap-3";
+                btn.id = `card-${item.id}`;
+                btn.onclick = () => selectVocab(item.id);
+                btn.innerHTML = `
+                    <div class="text-2xl">${item.icon}</div>
+                    <div class="font-bold text-gray-700">${item.term}</div>
+                `;
+                listEl.appendChild(btn);
+            });
+        }
+
+        function selectVocab(id) {
+            if (currentVocabId) {
+                document.getElementById(`card-${currentVocabId}`).classList.remove('active');
+            }
+            currentVocabId = id;
+            document.getElementById(`card-${id}`).classList.add('active');
+
+            document.getElementById('vocab-detail-empty').classList.add('hide');
+            document.getElementById('vocab-detail-content').classList.remove('hide');
+
+            const data = vocabData.find(v => v.id === id);
+            document.getElementById('v-icon').innerText = data.icon;
+            document.getElementById('v-title').innerText = data.term;
+            document.getElementById('v-pronounce').innerText = `/${data.pronounce}/`;
+            document.getElementById('v-def').innerText = data.def;
+            document.getElementById('v-ex').innerText = `"${data.ex}"`;
+
+            renderDynamicZone(data.term);
+        }
+
+        function renderDynamicZone(term) {
+            const zone = document.getElementById('v-dynamic-zone');
+            zone.innerHTML = '';
+
+            let content = '';
+
+            switch(term) {
+                case 'Force':
+                    content = `
+                        <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                            <div class="text-3xl animate-bounce">⚽</div>
+                            <div class="text-2xl font-bold text-rkOrange">➡️</div>
+                            <div class="text-sm font-bold text-gray-500">Force causes motion!</div>
+                        </div>`;
+                    break;
+                case 'Push':
+                    content = `
+                        <div class="flex items-center gap-2 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                            <div class="text-3xl">✋</div>
+                            <div class="w-16 h-2 bg-rkOrange rounded"></div>
+                            <div class="text-3xl transform translate-x-4 transition-transform duration-1000" style="animation: pushAnim 2s infinite">📦</div>
+                        </div>
+                        <style>@keyframes pushAnim { 0% { transform: translateX(0); } 50% { transform: translateX(20px); } 100% { transform: translateX(0); } }</style>
+                    `;
+                    break;
+                case 'Pull':
+                    content = `
+                        <div class="flex items-center gap-2 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                            <div class="text-3xl transform -translate-x-4 transition-transform duration-1000" style="animation: pullAnim 2s infinite">📦</div>
+                            <div class="w-16 h-1 border-t-2 border-dashed border-rkBlue"></div>
+                            <div class="text-3xl">🪢</div>
+                        </div>
+                        <style>@keyframes pullAnim { 0% { transform: translateX(0); } 50% { transform: translateX(20px); } 100% { transform: translateX(0); } }</style>
+                    `;
+                    break;
+                case 'Gravity':
+                    content = `
+                        <div class="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-32 relative w-32">
+                            <div class="text-3xl absolute top-2" style="animation: dropAnim 1.5s infinite ease-in">🍎</div>
+                            <div class="w-24 h-2 bg-green-500 absolute bottom-2 rounded"></div>
+                        </div>
+                        <style>@keyframes dropAnim { 0% { top: 8px; opacity: 1; } 80% { top: 80px; opacity: 1; } 90% { top: 80px; opacity: 0; } 100% { top: 8px; opacity: 0;} }</style>
+                    `;
+                    break;
+                case 'Friction':
+                    content = `
+                        <div class="flex flex-col items-center gap-2 bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-xs relative">
+                            <div class="text-2xl absolute left-4 z-10" style="animation: slideFriction 3s infinite">🚴</div>
+                            <div class="w-full h-4 bg-gray-300 rounded mt-8 flex space-x-1 overflow-hidden">
+                                <div class="w-2 h-full bg-gray-400"></div><div class="w-2 h-full bg-gray-400"></div><div class="w-2 h-full bg-gray-400"></div><div class="w-2 h-full bg-gray-400"></div>
+                            </div>
+                            <div class="text-xs font-bold text-rkRed">Bumpy surface slows it down!</div>
+                        </div>
+                        <style>@keyframes slideFriction { 0% { left: 10px; } 50% { left: 80%; } 100% { left: 10px; } }</style>
+                    `;
+                    break;
+                case 'Centrifugal Force':
+                    content = `
+                        <div class="relative w-24 h-24 bg-white rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center" style="animation: spinAnim 2s linear infinite">
+                            <div class="absolute w-full h-1 bg-rkLines flex justify-end items-center">
+                                <div class="text-2xl -mr-3 transform rotate-90">🎠</div>
+                            </div>
+                        </div>
+                        <style>@keyframes spinAnim { 100% { transform: rotate(360deg); } }</style>
+                    `;
+                    break;
+                case 'Electromagnetism':
+                    content = `
+                        <div class="flex items-center justify-between w-48 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                            <div class="text-4xl" style="animation: magnetWiggle 0.5s infinite">🧲</div>
+                            <div class="flex space-x-1" style="animation: attractAnim 1.5s infinite">
+                                <div class="text-xl">📎</div><div class="text-xl">📎</div>
+                            </div>
+                        </div>
+                        <style>
+                            @keyframes magnetWiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+                            @keyframes attractAnim { 0% { transform: translateX(20px); opacity:0;} 50% { transform: translateX(0); opacity:1;} 100% { transform: translateX(0); opacity:1;} }
+                        </style>
+                    `;
+                    break;
+                case 'Sound Waves':
+                    content = `
+                        <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                            <div class="text-4xl">🎸</div>
+                            <div class="flex gap-1 items-center h-10">
+                                <div class="w-2 bg-rkBlue rounded-full" style="animation: wave 1s infinite 0.1s"></div>
+                                <div class="w-2 bg-rkBlue rounded-full" style="animation: wave 1s infinite 0.2s"></div>
+                                <div class="w-2 bg-rkBlue rounded-full" style="animation: wave 1s infinite 0.3s"></div>
+                                <div class="w-2 bg-rkBlue rounded-full" style="animation: wave 1s infinite 0.4s"></div>
+                            </div>
+                            <div class="text-4xl">👂</div>
+                        </div>
+                        <style>@keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }</style>
+                    `;
+                    break;
+                case 'Light (Duality)':
+                    content = `
+                        <div class="flex flex-col items-center gap-2 bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-700 w-full max-w-xs">
+                            <div class="flex justify-between w-full text-white text-xs font-bold mb-2">
+                                <span>Particle (Photon)</span>
+                                <span>Wave</span>
+                            </div>
+                            <div class="flex items-center justify-between w-full relative h-8">
+                                <div class="text-2xl absolute left-0 text-rkSunYellow" style="animation: shoot 1s infinite linear">✨</div>
+                                <div class="w-full h-2 border-t-2 border-b-2 border-dotted border-rkSunYellow opacity-50 rounded-full mx-8"></div>
+                                <div class="text-2xl absolute right-0 text-rkSunYellow" style="animation: wiggle 0.5s infinite ease-in-out">〰️</div>
+                            </div>
+                        </div>
+                        <style>
+                            @keyframes shoot { 0% { left: 10px; opacity:1;} 100% { left: 90px; opacity:0;} }
+                            @keyframes wiggle { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(3px); } }
+                        </style>
+                    `;
+                    break;
+                default:
+                    content = `<div class="text-gray-400 font-bold">Visual representation unavailable.</div>`;
+            }
+
+            zone.innerHTML = content;
+        }
+    </script>
+</body>
+</html>
