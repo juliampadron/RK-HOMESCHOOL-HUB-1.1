@@ -1,260 +1,267 @@
 import jsPDF from "jspdf";
 
-export interface QuarterlyReport {
-  student_id: string;
-  year: number;
-  quarter: number;
-  period: { start: string; end: string };
-  skills: SkillRecord[];
-  assessments: AssessmentRecord[];
-  worksheets: WorksheetRecord[];
-  summary: ReportSummary;
-  ihip_compliant: boolean;
-  generated_at: string;
+export interface QuarterlyProgressReport {
+  student: {
+    id: string;
+    displayName: string;
+    gradeBand: string;
+    parentGuardian: string;
+    district: string;
+  };
+  report: {
+    year: number;
+    quarter: number;
+    periodStart: string;
+    periodEnd: string;
+    generatedAt: string;
+  };
+  summary: {
+    totalHours: number;
+    classesEnrolled: number;
+    instructors: number;
+  };
+  subjects: SubjectBreakdown[];
+  standardsBySubject: StandardsBySubject[];
+  portfolioItems: PortfolioItem[];
+  instructorFeedback: InstructorFeedback[];
+  portfolioUrl?: string;
 }
 
-interface SkillRecord {
-  id: number;
-  standard_code: string;
+export interface SubjectBreakdown {
   subject: string;
-  grade_level: string;
-  skill_name: string;
-  mastery_level: string;
-  last_assessed_at: string | null;
+  hours: number;
+  classHighlights: string[];
 }
 
-interface AssessmentRecord {
-  id: number;
+export interface StandardsBySubject {
   subject: string;
-  grade_level: string;
+  standards: Array<{ code: string; description: string }>;
+}
+
+export interface PortfolioItem {
   title: string;
-  assessment_type: string;
-  score_percentage: number | null;
-  mastery_determination: string | null;
-  assessed_at: string;
+  submittedAt: string;
+  standard: string;
 }
 
-interface WorksheetRecord {
-  id: number;
-  template_id: string;
+export interface InstructorFeedback {
+  instructor: string;
   subject: string;
-  difficulty_level: string;
-  status: string;
-  score_percentage: number | null;
-  completed_at: string | null;
+  note: string;
 }
 
-interface ReportSummary {
-  total_skills_tracked: number;
-  total_assessments: number;
-  total_worksheets_completed: number;
-  average_assessment_score: number | null;
+const PAGE_WIDTH = 216;
+const PAGE_HEIGHT = 279;
+const MARGIN = 16;
+const RK_ORANGE: [number, number, number] = [240, 90, 34];
+const RK_BLUE: [number, number, number] = [43, 89, 195];
+
+function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
-const BRAND_ORANGE = "#F05A22";
-const BRAND_BLUE = "#2B59C3";
-const PAGE_MARGIN = 15;
+function quarterLabel(quarter: number, year: number): string {
+  return `Q${quarter} ${year}`;
+}
 
-function addPageHeader(doc: jsPDF, title: string, subtitle: string): number {
-  doc.setFillColor(BRAND_ORANGE);
-  doc.rect(0, 0, 216, 18, "F");
-  doc.setTextColor("#FFFFFF");
-  doc.setFontSize(13);
+function setBrandHeader(doc: jsPDF, title: string, subtitle: string): void {
+  doc.setFillColor(...RK_ORANGE);
+  doc.rect(0, 0, PAGE_WIDTH, 20, "F");
+  doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
-  doc.text("Renaissance Kids Homeschool Hub", PAGE_MARGIN, 11);
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.text("NYS IHIP Compliance Report", 216 - PAGE_MARGIN, 11, { align: "right" });
-
-  let y = 26;
-  doc.setTextColor(BRAND_BLUE);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(title, PAGE_MARGIN, y);
-  y += 7;
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor("#444444");
-  doc.text(subtitle, PAGE_MARGIN, y);
-  y += 8;
-  doc.setDrawColor(BRAND_ORANGE);
-  doc.setLineWidth(0.5);
-  doc.line(PAGE_MARGIN, y, 216 - PAGE_MARGIN, y);
-  return y + 6;
-}
-
-function addSectionTitle(doc: jsPDF, title: string, y: number): number {
   doc.setFontSize(11);
+  doc.text("Renaissance Kids Logo", MARGIN, 12);
+  doc.setFontSize(13);
+  doc.text(title, PAGE_WIDTH - MARGIN, 10, { align: "right" });
+  doc.setFontSize(10);
+  doc.text(subtitle, PAGE_WIDTH - MARGIN, 15, { align: "right" });
+}
+
+function sectionTitle(doc: jsPDF, text: string, y: number): number {
+  doc.setTextColor(...RK_BLUE);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(BRAND_BLUE);
-  doc.text(title, PAGE_MARGIN, y);
+  doc.setFontSize(12);
+  doc.text(text.toUpperCase(), MARGIN, y);
+  y += 3;
+  doc.setDrawColor(...RK_BLUE);
+  doc.setLineWidth(0.3);
+  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
   return y + 6;
 }
 
-function addKeyValue(
-  doc: jsPDF,
-  key: string,
-  value: string,
-  y: number
-): number {
-  doc.setFontSize(9);
+function kv(doc: jsPDF, label: string, value: string, y: number): number {
+  doc.setTextColor(20, 20, 20);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor("#333333");
-  doc.text(`${key}:`, PAGE_MARGIN, y);
+  doc.setFontSize(10);
+  doc.text(`${label}:`, MARGIN, y);
   doc.setFont("helvetica", "normal");
-  doc.text(value, PAGE_MARGIN + 40, y);
+  doc.text(value, MARGIN + 42, y);
   return y + 6;
+}
+
+function addPageFooter(doc: jsPDF, page: number, totalPages: number): void {
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(8);
+  doc.text(
+    `Renaissance Kids, Inc. • 1343 Route 44, Pleasant Valley, NY 12569 • (845) 452-4225 • www.renkids.org • Page ${page}/${totalPages}`,
+    PAGE_WIDTH / 2,
+    PAGE_HEIGHT - 6,
+    { align: "center" }
+  );
+}
+
+function addPageOne(doc: jsPDF, report: QuarterlyProgressReport): void {
+  setBrandHeader(doc, "QUARTERLY HOMESCHOOL", "PROGRESS REPORT");
+  let y = 30;
+
+  y = kv(
+    doc,
+    "Report Period",
+    `${quarterLabel(report.report.quarter, report.report.year)} (${formatDate(report.report.periodStart)} - ${formatDate(report.report.periodEnd)})`,
+    y
+  );
+  y = kv(doc, "Generated", formatDate(report.report.generatedAt), y);
+
+  y += 6;
+  y = sectionTitle(doc, "Student Information", y);
+  y = kv(doc, "Name", report.student.displayName, y);
+  y = kv(doc, "Grade", report.student.gradeBand, y);
+  y = kv(doc, "Parent/Guardian", report.student.parentGuardian, y);
+  y = kv(doc, "District", report.student.district, y);
+
+  y += 4;
+  y = sectionTitle(doc, "Instruction Summary", y);
+  y = kv(doc, "Total Hours This Quarter", `${report.summary.totalHours.toFixed(1)}`, y);
+  y = kv(doc, "Classes Enrolled", `${report.summary.classesEnrolled}`, y);
+  kv(doc, "Instructors", `${report.summary.instructors}`, y);
+}
+
+function addPageTwo(doc: jsPDF, report: QuarterlyProgressReport): void {
+  setBrandHeader(doc, "SUBJECT AREA HOURS", "NYS Required Subjects");
+  let y = 34;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+
+  for (const subject of report.subjects) {
+    doc.setFont("helvetica", "bold");
+    doc.text(subject.subject, MARGIN, y);
+    doc.text(`${subject.hours.toFixed(1)} hours`, PAGE_WIDTH - MARGIN, y, {
+      align: "right",
+    });
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    subject.classHighlights.slice(0, 2).forEach((line) => {
+      doc.text(`• ${line}`, MARGIN + 4, y);
+      y += 5;
+    });
+    y += 3;
+  }
+}
+
+function addPageThree(doc: jsPDF, report: QuarterlyProgressReport): void {
+  setBrandHeader(doc, "NYS LEARNING STANDARDS", "Met This Quarter");
+  let y = 34;
+
+  report.standardsBySubject.forEach((group) => {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...RK_BLUE);
+    doc.text(group.subject, MARGIN, y);
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(20, 20, 20);
+    group.standards.forEach((standard) => {
+      doc.text(`✓ ${standard.code}  ${standard.description}`, MARGIN + 2, y);
+      y += 5;
+    });
+    y += 3;
+  });
+}
+
+function addPageFour(doc: jsPDF, report: QuarterlyProgressReport): void {
+  setBrandHeader(doc, "PORTFOLIO SUBMISSIONS", "Evidence of Learning");
+  let y = 36;
+
+  report.portfolioItems.slice(0, 6).forEach((item) => {
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(MARGIN, y - 4, 20, 14);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text("[Thumbnail]", MARGIN + 1.5, y + 3);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(item.title, MARGIN + 24, y + 1);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(`Submitted: ${formatDate(item.submittedAt)}`, MARGIN + 24, y + 6);
+    doc.text(`Standard: ${item.standard}`, MARGIN + 24, y + 11);
+
+    y += 22;
+  });
+
+  y += 4;
+  doc.setTextColor(...RK_BLUE);
+  doc.text(`View full portfolio at: ${report.portfolioUrl ?? "renkids.org/portfolio"}`, MARGIN, y);
+}
+
+function addPageFive(doc: jsPDF, report: QuarterlyProgressReport): void {
+  setBrandHeader(doc, "INSTRUCTOR FEEDBACK", "& Parent/Guardian Certification");
+  let y = 36;
+
+  report.instructorFeedback.slice(0, 3).forEach((feedback) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(20, 20, 20);
+    doc.text(`${feedback.instructor} (${feedback.subject}):`, MARGIN, y);
+    y += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    const lines = doc.splitTextToSize(`"${feedback.note}"`, PAGE_WIDTH - 2 * MARGIN);
+    doc.text(lines, MARGIN + 2, y);
+    y += lines.length * 4.2 + 5;
+  });
+
+  y = sectionTitle(doc, "Parent/Guardian Certification", y + 2);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(20, 20, 20);
+  doc.setFontSize(10);
+  const cert =
+    "I certify that the information in this report accurately reflects the educational instruction provided this quarter.";
+  doc.text(doc.splitTextToSize(cert, PAGE_WIDTH - 2 * MARGIN), MARGIN, y);
+  y += 14;
+  doc.text("Signature: ________________________    Date: __________", MARGIN, y);
+  y += 8;
+  doc.text(`Print Name: ${report.student.parentGuardian}`, MARGIN, y);
 }
 
 export async function generateQuarterlyReportPdf(
-  report: QuarterlyReport
+  report: QuarterlyProgressReport
 ): Promise<ArrayBuffer> {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
 
-  const title = `IHIP Quarterly Report — Q${report.quarter} ${report.year}`;
-  const subtitle = `Period: ${report.period.start} to ${report.period.end}`;
-  let y = addPageHeader(doc, title, subtitle);
+  addPageOne(doc, report);
+  doc.addPage();
+  addPageTwo(doc, report);
+  doc.addPage();
+  addPageThree(doc, report);
+  doc.addPage();
+  addPageFour(doc, report);
+  doc.addPage();
+  addPageFive(doc, report);
 
-  // Student & report info
-  y = addSectionTitle(doc, "Report Information", y);
-  y = addKeyValue(doc, "Student ID", report.student_id, y);
-  y = addKeyValue(doc, "Academic Year", String(report.year), y);
-  y = addKeyValue(doc, "Quarter", String(report.quarter), y);
-  y = addKeyValue(
-    doc,
-    "IHIP Compliant",
-    report.ihip_compliant ? "Yes" : "No",
-    y
-  );
-  y = addKeyValue(
-    doc,
-    "Generated",
-    new Date(report.generated_at).toLocaleString(),
-    y
-  );
-  y += 4;
-
-  // Summary
-  y = addSectionTitle(doc, "Summary", y);
-  y = addKeyValue(
-    doc,
-    "Skills Tracked",
-    String(report.summary.total_skills_tracked),
-    y
-  );
-  y = addKeyValue(
-    doc,
-    "Assessments",
-    String(report.summary.total_assessments),
-    y
-  );
-  y = addKeyValue(
-    doc,
-    "Worksheets Completed",
-    String(report.summary.total_worksheets_completed),
-    y
-  );
-  y = addKeyValue(
-    doc,
-    "Avg Assessment Score",
-    report.summary.average_assessment_score !== null
-      ? `${report.summary.average_assessment_score}%`
-      : "N/A",
-    y
-  );
-  y += 4;
-
-  // Skills
-  if (report.skills.length > 0) {
-    y = addSectionTitle(doc, "Skill Mastery Overview", y);
-    for (const skill of report.skills) {
-      if (y > 260) {
-        doc.addPage();
-        y = addPageHeader(doc, title, subtitle);
-      }
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor("#333333");
-      doc.text(
-        `• [${skill.standard_code}] ${skill.skill_name} — ${skill.mastery_level.replace("_", " ")}`,
-        PAGE_MARGIN,
-        y
-      );
-      y += 5;
-    }
-    y += 3;
-  }
-
-  // Assessments
-  if (report.assessments.length > 0) {
-    if (y > 240) {
-      doc.addPage();
-      y = addPageHeader(doc, title, subtitle);
-    }
-    y = addSectionTitle(doc, "Assessments", y);
-    for (const assessment of report.assessments) {
-      if (y > 260) {
-        doc.addPage();
-        y = addPageHeader(doc, title, subtitle);
-      }
-      const score =
-        assessment.score_percentage !== null
-          ? `${assessment.score_percentage}%`
-          : "N/A";
-      const mastery = assessment.mastery_determination ?? "N/A";
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor("#333333");
-      doc.text(
-        `• ${assessment.title} (${assessment.subject}) — Score: ${score}, Mastery: ${mastery}`,
-        PAGE_MARGIN,
-        y
-      );
-      y += 5;
-    }
-    y += 3;
-  }
-
-  // Worksheets
-  if (report.worksheets.length > 0) {
-    if (y > 240) {
-      doc.addPage();
-      y = addPageHeader(doc, title, subtitle);
-    }
-    y = addSectionTitle(doc, "Worksheet Activity", y);
-    for (const worksheet of report.worksheets) {
-      if (y > 260) {
-        doc.addPage();
-        y = addPageHeader(doc, title, subtitle);
-      }
-      const score =
-        worksheet.score_percentage !== null
-          ? `${worksheet.score_percentage}%`
-          : "N/A";
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor("#333333");
-      doc.text(
-        `• ${worksheet.template_id} (${worksheet.subject}, ${worksheet.difficulty_level}) — Status: ${worksheet.status}, Score: ${score}`,
-        PAGE_MARGIN,
-        y
-      );
-      y += 5;
-    }
-  }
-
-  // Footer
-  const pageCount = doc.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i += 1) {
     doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor("#888888");
-    doc.text(
-      `© ${new Date().getFullYear()} Renaissance Kids  |  Page ${i} of ${pageCount}`,
-      216 / 2,
-      279,
-      { align: "center" }
-    );
+    addPageFooter(doc, i, totalPages);
   }
 
   return doc.output("arraybuffer");
