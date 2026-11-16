@@ -1,1 +1,11 @@
-Both free games (Solfege + Color Mixing) content here.
+Public Games Status
+
+- Solfege Staircase: PUBLIC
+  - URL: /homeschool-hub/solfege-staircase/
+
+- Color Mixing Canvas: PUBLIC
+  - URL: /homeschool-hub/color-mixing-canvas/
+
+Notes:
+- Solfege Staircase is implemented in this repository.
+- Color Mixing Canvas route should be kept publicly accessible when added/updated.
