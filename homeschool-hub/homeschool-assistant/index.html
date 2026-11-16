@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renaissance Kids · Homeschool Hub Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Official Renaissance Kids Brand Colors */
+            --rk-green: #2F6B65;
+            --rk-light-green: #408A82;
+            --rk-yellow: #FBC440;
+            --rk-orange: #F05A22;
+            --rk-skin: #F7C4A5;
+            --rk-dark: #1C1C1C;
+            --bg-gradient: linear-gradient(135deg, #fdfbf7 0%, #f4eee1 100%);
+            --chat-bg: #ffffff;
+            --user-msg-bg: #eaf3f1;
+            --bot-msg-bg: #fdf5e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--rk-dark);
+        }
+
+        /* Main Container */
+        .app-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(47, 107, 101, 0.15);
+            border: 2px solid rgba(251, 196, 64, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            background: var(--rk-green);
+            padding: 24px 32px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 6px solid var(--rk-yellow);
+        }
+
+        .header-icon {
+            background: white;
+            color: var(--rk-orange);
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 1rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .welcome-screen h2 {
+            color: var(--rk-green);
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .welcome-screen p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .input-group input {
+            padding: 16px 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 100px;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--rk-green);
+            box-shadow: 0 0 0 4px rgba(47, 107, 101, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--rk-yellow);
+            color: var(--rk-dark);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 var(--rk-orange);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--rk-orange);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--rk-orange);
+        }
+
+        /* Chat Screen */
+        .chat-screen {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            max-height: 70vh;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--chat-bg);
+        }
+
+        .msg-bubble {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 24px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: var(--user-msg-bg);
+            color: var(--rk-green);
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: var(--bot-msg-bg);
+            color: var(--rk-dark);
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(251, 196, 64, 0.4);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            padding: 16px 20px;
+            background: var(--bot-msg-bg);
+            border-radius: 24px;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            width: fit-content;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--rk-orange);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Chat Input Area */
+        .chat-input-area {
+            padding: 20px 32px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 16px 24px;
+            border: 2px solid #eee;
+            border-radius: 100px;
+            font-size: 1.1rem;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--rk-green);
+        }
+
+        .btn-send, .btn-refresh {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-send {
+            background: var(--rk-green);
+            color: white;
+        }
+
+        .btn-send:hover {
+            background: var(--rk-light-green);
+            transform: scale(1.05);
+        }
+
+        .btn-refresh {
+            background: var(--rk-skin);
+            color: var(--rk-orange);
+        }
+
+        .btn-refresh:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .app-container { border-radius: 0; border: none; height: 100vh; max-height: 100vh;}
+            .chat-screen { height: calc(100vh - 100px); max-height: none; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="header">
+        <div class="header-icon">
+            <i class="fa-solid fa-palette"></i>
+        </div>
+        <div class="header-text">
+            <h1>Renaissance Kids</h1>
+            <p>Homeschool Hub Assistant</p>
+        </div>
+    </header>
+
+    <div id="welcomeScreen" class="screen active welcome-screen">
+        <h2>Welcome to the Hub! 🌻</h2>
+        <p>I'm here to help you navigate our classes, registration, and homeschool resources.</p>
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="What is your name?" autocomplete="off">
+            <button class="btn-primary" id="startBtn">Start Chatting</button>
+        </div>
+    </div>
+
+    <div id="chatScreen" class="screen chat-screen">
+        <div class="chat-history" id="chatHistory"></div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask me about camps, classes, or policies..." autocomplete="off">
+            <button class="btn-send" id="sendBtn" title="Send Message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+            <button class="btn-refresh" id="refreshBtn" title="Restart Conversation">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * RenaissanceBot Logic Class
+ * Handles keyword matching and response generation, completely separate from the UI.
+ * Adheres to strict Copilot instructions (no price/date guessing).
+ */
+class RenaissanceBot {
+    constructor(userName) {
+        this.userName = userName || 'Friend';
+        this.knowledgeBase = [
+            {
+                keywords: ['register', 'enroll', 'sign up'],
+                response: 'Registration is easy! You can sign up through our parent portal on renkids.org. Because class availability and pricing updates seasonally, please check the portal or call our staff at (845) 452-4225 to finalize your enrollment.'
+            },
+            {
+                keywords: ['class', 'program', 'offer', 'subject'],
+                response: 'We offer an exciting mix of science, math, language arts, and art for ages 5–13! Our programs integrate academics with the arts to treat every child as an individual. Would you like the link to our current class schedule?'
+            },
+            {
+                keywords: ['camp', 'summer', 'spring break'],
+                response: 'We love our creative, arts-focused camps! We offer both Spring Break and Summer Camps filled with music, acting, and fine arts. For the exact dates and current tuition rates, I recommend visiting our website or checking your Homeschool Hub dashboard.'
+            },
+            {
+                keywords: ['price', 'cost', 'tuition', 'pay'],
+                response: "Because I'm an AI, I don't quote specific prices to ensure you get the most accurate information. We offer competitive rates and monthly billing options. Please check the registration PDFs in your Hub or give our front desk a call!"
+            },
+            {
+                keywords: ['private', 'music', 'instrument', 'piano', 'violin'],
+                response: 'Yes! We offer private music lessons in piano, violin, guitar, drums, and voice. These are scheduled by appointment to give your child personalized, 1:1 attention.'
+            },
+            {
+                keywords: ['member', 'verify', 'hub'],
+                response: 'Verified families unlock exclusive digital resources and member pricing! You can become verified by uploading a simple proof of enrollment document in your Hub profile.'
+            }
+        ];
+    }
+
+    getGreeting() {
+        return `Hello, ${this.userName}! 👋 I'm your Renaissance Kids assistant. How can I help you support your child's learning today?`;
+    }
+
+    getResponse(userInput) {
+        const input = userInput.toLowerCase();
+
+        // Check for greetings
+        if (input.includes('hello') || input.includes('hi')) return this.getGreeting();
+        if (input.includes('thank')) return "You're very welcome! Let me know if you need anything else.";
+
+        // Search knowledge base
+        for (const item of this.knowledgeBase) {
+            if (item.keywords.some(kw => input.includes(kw))) {
+                return item.response;
+            }
+        }
+
+        // Default fallback
+        return 'That’s a great question! For specific details on that, I recommend checking the official policies on renkids.org or contacting our nurturing staff directly at (845) 452-4225.';
+    }
+}
+
+/**
+ * UI Controller
+ * Manages DOM interactions, animations, and event listeners.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const screens = {
+        welcome: document.getElementById('welcomeScreen'),
+        chat: document.getElementById('chatScreen')
+    };
+    const inputs = {
+        name: document.getElementById('userName'),
+        chat: document.getElementById('chatInput')
+    };
+    const buttons = {
+        start: document.getElementById('startBtn'),
+        send: document.getElementById('sendBtn'),
+        refresh: document.getElementById('refreshBtn')
+    };
+    const chatHistory = document.getElementById('chatHistory');
+
+    let botInstance = null;
+    let isTyping = false;
+
+    // Switch between screens
+    const showScreen = (screenName) => {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        screens[screenName].classList.add('active');
+    };
+
+    // Scroll chat to bottom
+    const scrollToBottom = () => {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    };
+
+    // Add a message bubble to the chat
+    const appendMessage = (text, sender) => {
+        const div = document.createElement('div');
+        div.className = `msg-bubble msg-${sender}`;
+        div.textContent = text;
+        chatHistory.appendChild(div);
+        scrollToBottom();
+    };
+
+    // Typing indicator logic
+    const showTyping = () => {
+        isTyping = true;
+        const div = document.createElement('div');
+        div.className = 'typing-indicator';
+        div.id = 'typingIndicator';
+        div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        chatHistory.appendChild(div);
+        scrollToBottom();
+    };
+
+    const hideTyping = () => {
+        isTyping = false;
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    };
+
+    // Handle sending a message
+    const handleSend = () => {
+        const text = inputs.chat.value.trim();
+        if (!text || isTyping) return;
+
+        // User message
+        appendMessage(text, 'user');
+        inputs.chat.value = '';
+        inputs.chat.disabled = true;
+
+        // Bot response simulation
+        showTyping();
+        setTimeout(() => {
+            hideTyping();
+            const response = botInstance.getResponse(text);
+            appendMessage(response, 'bot');
+            inputs.chat.disabled = false;
+            inputs.chat.focus();
+        }, 1200 + Math.random() * 800);
+    };
+
+    // Initialize chat
+    const initChat = () => {
+        const name = inputs.name.value.trim() || 'Friend';
+        botInstance = new RenaissanceBot(name);
+
+        chatHistory.innerHTML = ''; // Clear history
+        showScreen('chat');
+        appendMessage(botInstance.getGreeting(), 'bot');
+        inputs.chat.focus();
+    };
+
+    // Event listeners
+    buttons.start.addEventListener('click', initChat);
+    inputs.name.addEventListener('keypress', (e) => { if (e.key === 'Enter') initChat(); });
+
+    buttons.send.addEventListener('click', handleSend);
+    inputs.chat.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+
+    buttons.refresh.addEventListener('click', () => {
+        showScreen('welcome');
+        inputs.name.value = '';
+        inputs.name.focus();
+    });
+});
+</script>
+
+</body>
+</html>
