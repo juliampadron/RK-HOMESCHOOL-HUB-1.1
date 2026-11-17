@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { useSearchParams } from 'next/navigation';
 
@@ -49,6 +49,14 @@ const webkitAudioContextClass =
   typeof window !== 'undefined' ? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext : undefined;
 
 export default function SolfegeStaircasePage() {
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-4xl p-6">Loading Solfege Staircase…</main>}>
+      <SolfegeStaircaseContent />
+    </Suspense>
+  );
+}
+
+function SolfegeStaircaseContent() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get('studentId') ?? searchParams.get('student_id') ?? undefined;
 
