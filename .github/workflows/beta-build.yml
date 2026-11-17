@@ -1,0 +1,51 @@
+name: Beta branch build
+
+on:
+  push:
+    branches:
+      - codex/beta-launch-secure-scaffold
+
+permissions:
+  contents: write
+
+jobs:
+  install-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out beta branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Generate lockfile
+        run: npm install --no-audit --no-fund
+      - name: Verify clean install from lockfile
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Production build
+        run: npm run build
+      - name: Upload lockfile for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-package-lock
+          path: package-lock.json
+          if-no-files-found: ignore
+      - name: Commit verified lockfile
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json is already current"
+          else
+            git commit -m "Add verified package lockfile"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
