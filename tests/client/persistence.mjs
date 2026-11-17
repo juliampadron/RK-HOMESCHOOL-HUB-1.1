@@ -38,7 +38,7 @@ const client={
     return query;
   },
 };
-const source=readFileSync(new URL('../../app/games/solfege-staircase/page.tsx',import.meta.url),'utf8');
+const source=readFileSync(new URL('../../src/app/homeschool-hub/solfege-staircase/page.tsx',import.meta.url),'utf8');
 const compiled=ts.transpileModule(source,{reportDiagnostics:true,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}});
 assert.equal(compiled.diagnostics.filter(d=>d.category===ts.DiagnosticCategory.Error).length,0);
 const mod={exports:{}};
