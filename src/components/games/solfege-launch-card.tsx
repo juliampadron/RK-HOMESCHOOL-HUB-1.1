@@ -8,7 +8,7 @@ interface SolfegeLaunchCardProps {
 }
 
 export default function SolfegeLaunchCard({ studentId, studentName }: SolfegeLaunchCardProps) {
-  const gameUrl = `/games/solfege-staircase?studentId=${encodeURIComponent(studentId)}`;
+  const gameUrl = `/homeschool-hub/solfege-staircase?studentId=${encodeURIComponent(studentId)}`;
 
   return (
     <section className="border-2 border-[#2F6B65] rounded-2xl bg-[#fdfbf7] p-5 shadow-lg">
